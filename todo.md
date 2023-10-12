@@ -1,22 +1,211 @@
 # All tasks todo
 
 - Exploratory data analysis and cleaning
-    - Clean out irrevelent features
-    - Decide on how we will treat NaNs
-    - One-hot encode binary variables, ex) country, file disposition
-    - Observe dataset distributions and identify confounders
+
+  - Clean out irrevelent features
+  - Decide on how we will treat NaNs
+  - One-hot encode binary variables, ex) country, file disposition
+  - Observe dataset distributions and identify confounders
 
 - Get basic model to work
 
 - Decide on how to feature engineer
 
-
 ## Features
 
-CADULT - Are you 18 years of age or older?
-GENHLTH
+CELLFON3
+GENHLTH - Big
 PHYSHLTH
 MENHLTH
 POORHLTH
+HLTHPLN1
+PERSDOC2
 MEDCOST
-CHECKUP1
+CHECKUP1 - Big
+BPHIGH4 - Big
+BPMEDS - Big
+BLOODCHO - Big
+CHOLCHK - Big
+TOLDHI2 - Big
+CVDINFR4 - Big
+CVDCRHD4 - Big
+CVDSTRK3 - Big
+ASTHMA3 - Big
+ASTHNOW - Big
+CHCSCNCR
+CHCOCNCR
+CHCCOPD1
+HAVARTH3
+ADDEPEV2
+CHCKIDNY
+DIABETE3 - Big
+DIABAGE2 - Big
+SEX - Big
+MARITAL - Big
+EDUCA
+RENTHOM1 - Big
+NUMHHOL2
+CPDEMO1
+VETERAN3
+EMPLOY1
+CHILDREN
+INCOME2
+WEIGHT2 - Big
+HEIGHT3 - Big
+PREGNANT - Big
+QLACTLM2 - Big
+USEEQUIP
+DECIDE
+DIFFWALK - Big
+DIFFDRES
+DIFFALON - Big
+SMOKE100 - Big
+SMOKDAY2 - Big
+STOPSMK2 - Big
+LASTSMK2 - Big
+USENOW3 - Big
+ALCDAY5 - Big
+AVEDRNK2 - Big
+DRNK3GE5 - Big
+MAXDRNKS - Big
+FRUITJU1
+FRUIT1
+FVBEANS
+FVGREEN
+FVORANG
+VEGETAB1
+EXERANY2 - Big
+EXRACT11
+EXEROFT1
+EXERHMM1
+STRENGTH - Big
+LMTJOIN3
+ARTHDIS2
+JOINPAIN
+FLUSHOT6
+FLSHTMY2
+PNEUVAC3
+HIVTST6
+HIVTSTD3
+PDIABTST - Big
+PREDIAB1 - Big
+INSULIN - Big
+BLDSUGAR - Big
+FEETCHK2 - Big
+DOCTDIAB - Big
+CHKHEMO3 - Big
+DIABEYE
+DIABEDU
+CAREGIV1 - Works with CRGVREL1
+CRGVREL1 - Works with CAREGIV1
+CRGVPRB1 - Works with both
+VINOCRE2
+CIMEMLOS
+WTCHSALT - big
+LONGWTCH
+DRADVISE - big
+ASTHMAGE
+ASATTACK - big
+ASDRVIST
+ASRCHKUP
+ASACTLIM
+ASYMPTOM
+ASNOSLEP
+ASTHMED3
+ASINHALR
+HAREHAB1 - big
+STREHAB1 - big
+CVDASPRN - big
+ASPUNSAF - big
+RLIVPAIN - big
+RDUCHART - big
+RDUCSTRK - big
+ARTTODAY - big
+ARTHWGT
+ARTHEXER
+ARTHEDU
+TETANUS
+HPVADVC2
+SHINGLE2
+HADMAM
+HOWLONG
+HADPAP2
+LASTPAP2
+HPVTEST
+HPLSTTST
+HADHYST2
+PROFEXAM
+LENGEXAM
+BLDSTOOL
+HADSIGM3
+LASTSIG3
+PCPSARE1
+PSATEST1
+PSATIME
+SCNTMNY1 - big
+SCNTMEL1 - big
+SCNTWRK1
+SCNTLWK1
+SXORIENT - big
+TRNSGNDR
+EMTSUPRT - big
+LSATISFY - big
+ADPLEASR - big
+ADDOWN - big
+ADSLEEP
+ADENERGY
+ADEAT1
+ADFAIL
+ADTHINK
+ADMOVE
+MISTMNT - big
+ADANXEV - big
+QSTLANG
+MSCODE - big
+_CHISPNC
+\_DUALUSE
+\_RFHLTH - ?
+\_RFHYPE5
+\_MICHD
+\_PRACE1
+\_MRACE1
+\_RACE
+\_AGEG5YR - big
+\_BMI5CAT - big
+\_CHLDCNT - big
+\_EDUCAG - big
+\_INCOMG - big
+\_SMOKER3 - big
+\_RFSMOK3 - big
+DRNKANY5 - big
+DROCDY3_ - big
+_RFBING5
+\_DRNKWEK
+\_RFDRHV5 - big
+\_FRTLT1
+\_VEGLT1
+\_TOTINDA
+ACTIN11_ - big
+ACTIN21\_
+\_MINAC21
+\_PACAT1 - big
+\_PAINDX1
+\_PA150R2
+\_PA300R2
+\_PA30021
+\_PASTRNG
+\_PAREC1
+\_LMTACT1 - big
+\_LMTWRK1 - big
+\_LMTSCL1 - big
+\_FLSHOT6
+\_PNEUMO2
+\_AIDTST3
+
+# Page 96 to end -> Maxime
+
+# From the botttom
+
+\_PNEUMO2
+\_AIDTST3
+\_FLSHOT6
