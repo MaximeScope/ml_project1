@@ -7,7 +7,7 @@
 
 - Get basic linear model to work
   [x] Train the model
-  [ ] Make the predictions
+  [x] Make the predictions
   [ ] Make a submission on the AICrowd to test
 
 - Optimise training
