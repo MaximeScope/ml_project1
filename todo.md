@@ -6,8 +6,8 @@
   [ ] Create a second filtered tx based on correlation
 
 - Get basic linear model to work
-  [ ] Train the model
-  [ ] Make the predictions
+  [x] Train the model
+  [x] Make the predictions
   [ ] Make a submission on the AICrowd to test
 
 - Optimise training
