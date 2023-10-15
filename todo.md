@@ -2,14 +2,24 @@
 
 - Exploratory data analysis and cleaning
 
-  - Clean out irrevelent features
-  - Decide on how we will treat NaNs
-  - One-hot encode binary variables, ex) country, file disposition
-  - Observe dataset distributions and identify confounders
+[x] Manually clean out irrevelent features
+[ ] Create an first filtered tx based on json
+[ ] Create a second filtered tx based on correlation
 
-- Get basic model to work
+- Get basic linear model to work
+[ ] Train the model
+[ ] Make the predictions
+[ ] Make a submission on the AICrowd to test
 
-- Decide on how to feature engineer
+- Optimise training
+[ ] Feature engineer
+[ ] Optimise the regularisation hyperparameters/grid search for that
+
+- Finish code up
+[ ] Improve/clean code
+[ ] Implemment the GD/SGD, prove we don't have to use it for report
+
+- Write report
 
 ## Features
 
