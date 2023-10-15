@@ -1,10 +1,9 @@
 # All tasks todo
 
 - Exploratory data analysis and cleaning
-
-[x] Manually clean out irrevelent features
-[ ] Create an first filtered tx based on json
-[ ] Create a second filtered tx based on correlation
+  [x] Manually clean out irrevelent features
+  [x] Create an first filtered tx based on json
+  [ ] Create a second filtered tx based on correlation
 
 - Get basic linear model to work
   [ ] Train the model
