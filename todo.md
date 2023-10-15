@@ -201,11 +201,3 @@ ACTIN21\_
 \_FLSHOT6
 \_PNEUMO2
 \_AIDTST3
-
-# Page 96 to end -> Maxime
-
-# From the botttom
-
-\_PNEUMO2
-\_AIDTST3
-\_FLSHOT6

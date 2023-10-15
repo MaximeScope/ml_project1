@@ -1,0 +1,758 @@
+[
+    {
+        "title": "CELLFON3",
+        "big": false
+    },
+    {
+        "title": "GENHLTH",
+        "big": true
+    },
+    {
+        "title": "PHYSHLTH",
+        "big": true
+    },
+    {
+        "title": "MENHLTH",
+        "big": false
+    },
+    {
+        "title": "POORHLTH",
+        "big": false
+    },
+    {
+        "title": "HLTHPLN1",
+        "big": false
+    },
+    {
+        "title": "PERSDOC2",
+        "big": false
+    },
+    {
+        "title": "MEDCOST",
+        "big": false
+    },
+    {
+        "title": "CHECKUP1",
+        "big": true
+    },
+    {
+        "title": "BPHIGH4",
+        "big": true
+    },
+    {
+        "title": "BPMEDS",
+        "big": true
+    },
+    {
+        "title": "BPMEDS",
+        "big": true
+    },
+    {
+        "title": "BLOODCHO",
+        "big": true
+    },
+    {
+        "title": "CHOLCHK",
+        "big": true
+    },
+    {
+        "title": "TOLDHI2",
+        "big": true
+    },
+    {
+        "title": "CVDINFR4",
+        "big": true
+    },
+    {
+        "title": "CVDCRHD4",
+        "big": true
+    },
+    {
+        "title": "CVDSTRK3",
+        "big": true
+    },
+    {
+        "title": "ASTHMA3",
+        "big": true
+    },
+    {
+        "title": "ASTHNOW",
+        "big": true
+    },
+    {
+        "title": "ASTHMA3",
+        "big": true
+    },
+    {
+        "title": "CHCSCNCR",
+        "big": false
+    },
+    {
+        "title": "CHCCOPD1",
+        "big": false
+    },
+    {
+        "title": "HAVARTH3",
+        "big": false
+    },
+    {
+        "title": "ADDEPEV2",
+        "big": false
+    },
+    {
+        "title": "CHCKIDNY",
+        "big": false
+    },
+    {
+        "title": "DIABETE3",
+        "big": true
+    },
+    {
+        "title": "DIABAGE2",
+        "big": true
+    },
+    {
+        "title": "SEX",
+        "big": true
+    },
+    {
+        "title": "MARITAL",
+        "big": true
+    },
+    {
+        "title": "EDUCA",
+        "big": false
+    },
+    {
+        "title": "RENTHOM1",
+        "big": true
+    },
+    {
+        "title": "NUMHHOL2",
+        "big": false
+    },
+    {
+        "title": "CPDEMO1",
+        "big": false
+    },
+    {
+        "title": "VETERAN3",
+        "big": false
+    },
+    {
+        "title": "EMPLOY1",
+        "big": false
+    },
+    {
+        "title": "CHILDREN",
+        "big": false
+    },
+    {
+        "title": "INCOME2",
+        "big": false
+    },
+    {
+        "title": "WEIGHT2",
+        "big": true
+    },
+    {
+        "title": "HEIGHT3",
+        "big": true
+    },
+    {
+        "title": "PREGNANT",
+        "big": true
+    },
+    {
+        "title": "QLACTLM2",
+        "big": true
+    },
+    {
+        "title": "USEEQUIP",
+        "big": false
+    },
+    {
+        "title": "DECIDE",
+        "big": false
+    },
+    {
+        "title": "DIFFWALK",
+        "big": true
+    },
+    {
+        "title": "DIFFDRES",
+        "big": false
+    },
+    {
+        "title": "DIFFALON",
+        "big": true
+    },
+    {
+        "title": "SMOKE100",
+        "big": true
+    },
+    {
+        "title": "SMOKDAY2",
+        "big": true
+    },
+    {
+        "title": "STOPSMK2",
+        "big": true
+    },
+    {
+        "title": "LASTSMK2",
+        "big": true
+    },
+    {
+        "title": "USENOW3",
+        "big": true
+    },
+    {
+        "title": "ALCDAY5",
+        "big": true
+    },
+    {
+        "title": "AVEDRNK2",
+        "big": true
+    },
+    {
+        "title": "DRNK3GE5",
+        "big": true
+    },
+    {
+        "title": "MAXDRNKS",
+        "big": true
+    },
+    {
+        "title": "FRUITJU1",
+        "big": false
+    },
+    {
+        "title": "FRUIT1",
+        "big": false
+    },
+    {
+        "title": "FVBEANS",
+        "big": false
+    },
+    {
+        "title": "FVGREEN",
+        "big": false
+    },
+    {
+        "title": "FVORANG",
+        "big": false
+    },
+    {
+        "title": "VEGETAB1",
+        "big": false
+    },
+    {
+        "title": "EXERANY2",
+        "big": true
+    },
+    {
+        "title": "EXRACT11",
+        "big": false
+    },
+    {
+        "title": "EXEROFT1",
+        "big": false
+    },
+    {
+        "title": "EXERHMM1",
+        "big": false
+    },
+    {
+        "title": "STRENGTH",
+        "big": true
+    },
+    {
+        "title": "LMTJOIN3",
+        "big": false
+    },
+    {
+        "title": "ARTHDIS2",
+        "big": false
+    },
+    {
+        "title": "JOINPAIN",
+        "big": false
+    },
+    {
+        "title": "FLUSHOT6",
+        "big": true
+    },
+    {
+        "title": "FLSHTMY2",
+        "big": false
+    },
+    {
+        "title": "PNEUVAC3",
+        "big": false
+    },
+    {
+        "title": "HIVTST6",
+        "big": false
+    },
+    {
+        "title": "HIVTSTD3",
+        "big": false
+    },
+    {
+        "title": "PDIABTST",
+        "big": true
+    },
+    {
+        "title": "PREDIAB1",
+        "big": true
+    },
+    {
+        "title": "INSULIN",
+        "big": true
+    },
+    {
+        "title": "BLDSUGAR",
+        "big": true
+    },
+    {
+        "title": "FEETCHK2",
+        "big": true
+    },
+    {
+        "title": "DOCTDIAB",
+        "big": true
+    },
+    {
+        "title": "CHKHEMO3",
+        "big": true
+    },
+    {
+        "title": "DIABEYE",
+        "big": false
+    },
+    {
+        "title": "DIABEDU",
+        "big": false
+    },
+    {
+        "title": "CAREGIV1",
+        "big": false
+    },
+    {
+        "title": "CRGVREL1",
+        "big": false
+    },
+    {
+        "title": "CRGVPRB1",
+        "big": false
+    },
+    {
+        "title": "VINOCRE2",
+        "big": false
+    },
+    {
+        "title": "CIMEMLOS",
+        "big": false
+    },
+    {
+        "title": "WTCHSALT",
+        "big": true
+    },
+    {
+        "title": "LONGWTCH",
+        "big": false
+    },
+    {
+        "title": "DRADVISE",
+        "big": true
+    },
+    {
+        "title": "ASTHMAGE",
+        "big": false
+    },
+    {
+        "title": "ASATTACK",
+        "big": true
+    },
+    {
+        "title": "ASDRVIST",
+        "big": false
+    },
+    {
+        "title": "ASRCHKUP",
+        "big": false
+    },
+    {
+        "title": "ASACTLIM",
+        "big": false
+    },
+    {
+        "title": "ASYMPTOM",
+        "big": false
+    },
+    {
+        "title": "ASNOSLEP",
+        "big": false
+    },
+    {
+        "title": "ASTHMED3",
+        "big": false
+    },
+    {
+        "title": "ASINHALR",
+        "big": false
+    },
+    {
+        "title": "HAREHAB1",
+        "big": true
+    },
+    {
+        "title": "STREHAB1",
+        "big": true
+    },
+    {
+        "title": "CVDASPRN",
+        "big": true
+    },
+    {
+        "title": "ASPUNSAF",
+        "big": true
+    },
+    {
+        "title": "RLIVPAIN",
+        "big": true
+    },
+    {
+        "title": "RDUCHART",
+        "big": true
+    },
+    {
+        "title": "RDUCSTRK",
+        "big": true
+    },
+    {
+        "title": "ARTTODAY",
+        "big": true
+    },
+    {
+        "title": "ARTHWGT",
+        "big": false
+    },
+    {
+        "title": "ARTHEXER",
+        "big": false
+    },
+    {
+        "title": "ARTHEDU",
+        "big": false
+    },
+    {
+        "title": "TETANUS",
+        "big": false
+    },
+    {
+        "title": "HPVADVC2",
+        "big": false
+    },
+    {
+        "title": "SHINGLE2",
+        "big": false
+    },
+    {
+        "title": "HADMAM",
+        "big": false
+    },
+    {
+        "title": "HOWLONG",
+        "big": false
+    },
+    {
+        "title": "HADPAP2",
+        "big": false
+    },
+    {
+        "title": "LASTPAP2",
+        "big": false
+    },
+    {
+        "title": "HPVTEST",
+        "big": false
+    },
+    {
+        "title": "HPLSTTST",
+        "big": false
+    },
+    {
+        "title": "HADHYST2",
+        "big": false
+    },
+    {
+        "title": "PROFEXAM",
+        "big": false
+    },
+    {
+        "title": "LENGEXAM",
+        "big": false
+    },
+    {
+        "title": "BLDSTOOL",
+        "big": false
+    },
+    {
+        "title": "HADSIGM3",
+        "big": false
+    },
+    {
+        "title": "LASTSIG3",
+        "big": false
+    },
+    {
+        "title": "PCPSARE1",
+        "big": false
+    },
+    {
+        "title": "PSATEST1",
+        "big": false
+    },
+    {
+        "title": "PSATIME",
+        "big": false
+    },
+    {
+        "title": "SCNTMNY1",
+        "big": true
+    },
+    {
+        "title": "SCNTMEL1",
+        "big": true
+    },
+    {
+        "title": "SCNTWRK1",
+        "big": false
+    },
+    {
+        "title": "SCNTLWK1",
+        "big": false
+    },
+    {
+        "title": "SXORIENT",
+        "big": true
+    },
+    {
+        "title": "TRNSGNDR",
+        "big": false
+    },
+    {
+        "title": "EMTSUPRT",
+        "big": true
+    },
+    {
+        "title": "LSATISFY",
+        "big": true
+    },
+    {
+        "title": "ADPLEASR",
+        "big": true
+    },
+    {
+        "title": "ADDOWN",
+        "big": true
+    },
+    {
+        "title": "ADSLEEP",
+        "big": false
+    },
+    {
+        "title": "ADENERGY",
+        "big": false
+    },
+    {
+        "title": "ADEAT1",
+        "big": false
+    },
+    {
+        "title": "ADFAIL",
+        "big": false
+    },
+    {
+        "title": "ADTHINK",
+        "big": false
+    },
+    {
+        "title": "ADMOVE",
+        "big": false
+    },
+    {
+        "title": "MISTMNT",
+        "big": true
+    },
+    {
+        "title": "ADANXEV",
+        "big": true
+    },
+    {
+        "title": "QSTLANG",
+        "big": false
+    },
+    {
+        "title": "MSCODE",
+        "big": true
+    },
+    {
+        "title": "_CHISPNC",
+        "big": false
+    },
+    {
+        "title": "_DUALUSE",
+        "big": false
+    },
+    {
+        "title": "_RFHLTH",
+        "big": false
+    },
+    {
+        "title": "_RFHYPE5",
+        "big": false
+    },
+    {
+        "title": "_MICHD",
+        "big": false
+    },
+    {
+        "title": "_PRACE1",
+        "big": false
+    },
+    {
+        "title": "_MRACE1",
+        "big": false
+    },
+    {
+        "title": "_RACE",
+        "big": false
+    },
+    {
+        "title": "_AGEG5YR",
+        "big": true
+    },
+    {
+        "title": "_BMI5CAT",
+        "big": true
+    },
+    {
+        "title": "_CHLDCNT",
+        "big": true
+    },
+    {
+        "title": "_EDUCAG",
+        "big": true
+    },
+    {
+        "title": "_INCOMG",
+        "big": true
+    },
+    {
+        "title": "_SMOKER3",
+        "big": true
+    },
+    {
+        "title": "_RFSMOK3",
+        "big": true
+    },
+    {
+        "title": "DRNKANY5",
+        "big": true
+    },
+    {
+        "title": "DROCDY3_",
+        "big": true
+    },
+    {
+        "title": "_RFBING5",
+        "big": false
+    },
+    {
+        "title": "DRNKWEK",
+        "big": false
+    },
+    {
+        "title": "_RFDRHV5",
+        "big": true
+    },
+    {
+        "title": "_FRTLT1",
+        "big": false
+    },
+    {
+        "title": "_VEGLT1",
+        "big": false
+    },
+    {
+        "title": "_TOTINDA",
+        "big": false
+    },
+    {
+        "title": "ACTIN11_",
+        "big": true
+    },
+    {
+        "title": "ACTIN21_",
+        "big": true
+    },
+    {
+        "title": "_MINAC21",
+        "big": false
+    },
+    {
+        "title": "_PACAT1",
+        "big": false
+    },
+    {
+        "title": "_PAINDX1",
+        "big": false
+    },
+    {
+        "title": "_PA150R2",
+        "big": false
+    },
+    {
+        "title": "_PA300R2",
+        "big": false
+    },
+    {
+        "title": "_PA30021",
+        "big": false
+    },
+    {
+        "title": "_PASTRNG",
+        "big": false
+    },
+    {
+        "title": "_PAREC1",
+        "big": false
+    },
+    {
+        "title": "_LMTACT1",
+        "big": true
+    },
+    {
+        "title": "_LMTWRK1",
+        "big": true
+    },
+    {
+        "title": "_LMTSCL1",
+        "big": true
+    },
+    {
+        "title": "_FLSHOT6",
+        "big": false
+    },
+    {
+        "title": "_PNEUMO2",
+        "big": false
+    },
+    {
+        "title": "_AIDTST3",
+        "big": false
+    }
+]
