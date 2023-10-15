@@ -39,7 +39,7 @@ def load_y(data_path, sub_sample=False):
         y = y[::50]
     return y
 
-def create_csv_submission(ids, y_pred, name):
+def create_csv_submission(y_pred, name):
     """
     Creates an output file in .csv format for submission to Kaggle or AIcrowd
     Arguments: ids (event ids associated with each prediction)
@@ -47,8 +47,8 @@ def create_csv_submission(ids, y_pred, name):
                name (string name of .csv output file to be created)
     """
     with open(name, "w") as csvfile:
-        fieldnames = ["Id", "Prediction"]
+        fieldnames = ["Prediction"]
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
-        for r1, r2 in zip(ids, y_pred):
-            writer.writerow({"Id": int(r1), "Prediction": int(r2)})
+        for r1 in y_pred:
+            writer.writerow({"Prediction": int(r1)})
