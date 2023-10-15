@@ -12,7 +12,7 @@
         "big": true
     },
     {
-        "title": "MENHLTH",
+        "title": "MENTHLTH",
         "big": false
     },
     {
@@ -57,14 +57,6 @@
     },
     {
         "title": "TOLDHI2",
-        "big": true
-    },
-    {
-        "title": "CVDINFR4",
-        "big": true
-    },
-    {
-        "title": "CVDCRHD4",
         "big": true
     },
     {
@@ -616,10 +608,6 @@
         "big": false
     },
     {
-        "title": "_MICHD",
-        "big": false
-    },
-    {
         "title": "_PRACE1",
         "big": false
     },
@@ -672,7 +660,7 @@
         "big": false
     },
     {
-        "title": "DRNKWEK",
+        "title": "_DRNKWEK",
         "big": false
     },
     {

@@ -7,17 +7,17 @@
 [ ] Create a second filtered tx based on correlation
 
 - Get basic linear model to work
-[ ] Train the model
-[ ] Make the predictions
-[ ] Make a submission on the AICrowd to test
+  [ ] Train the model
+  [ ] Make the predictions
+  [ ] Make a submission on the AICrowd to test
 
 - Optimise training
-[ ] Feature engineer
-[ ] Optimise the regularisation hyperparameters/grid search for that
+  [ ] Feature engineer
+  [ ] Optimise the regularisation hyperparameters/grid search for that
 
 - Finish code up
-[ ] Improve/clean code
-[ ] Implemment the GD/SGD, prove we don't have to use it for report
+  [ ] Improve/clean code
+  [ ] Implemment the GD/SGD, prove we don't have to use it for report
 
 - Write report
 
@@ -26,7 +26,7 @@
 CELLFON3
 GENHLTH - Big
 PHYSHLTH
-MENHLTH
+MENTHLTH
 POORHLTH
 HLTHPLN1
 PERSDOC2
@@ -37,8 +37,8 @@ BPMEDS - Big
 BLOODCHO - Big
 CHOLCHK - Big
 TOLDHI2 - Big
-CVDINFR4 - Big
-CVDCRHD4 - Big
+CVDINFR4 - Big - ignored in x*train
+CVDCRHD4 - Big - ignored in x_train
 CVDSTRK3 - Big
 ASTHMA3 - Big
 ASTHNOW - Big
@@ -172,11 +172,11 @@ MISTMNT - big
 ADANXEV - big
 QSTLANG
 MSCODE - big
-_CHISPNC
+\_CHISPNC
 \_DUALUSE
 \_RFHLTH - ?
 \_RFHYPE5
-\_MICHD
+\_MICHD - ignored in x_train
 \_PRACE1
 \_MRACE1
 \_RACE
@@ -188,7 +188,7 @@ _CHISPNC
 \_SMOKER3 - big
 \_RFSMOK3 - big
 DRNKANY5 - big
-DROCDY3_ - big
+DROCDY3* - big
 _RFBING5
 \_DRNKWEK
 \_RFDRHV5 - big
