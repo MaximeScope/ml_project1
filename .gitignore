@@ -1,4 +1,5 @@
 *.csv
 *.ipynb
+.idea
 __MACOSX/
 __pycache__/
