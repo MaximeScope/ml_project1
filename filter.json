@@ -1,9 +1,5 @@
 [
     {
-        "title": "CELLFON3",
-        "big": false
-    },
-    {
         "title": "GENHLTH",
         "big": true
     },
@@ -44,10 +40,6 @@
         "big": true
     },
     {
-        "title": "BPMEDS",
-        "big": true
-    },
-    {
         "title": "BLOODCHO",
         "big": true
     },
@@ -69,10 +61,6 @@
     },
     {
         "title": "ASTHNOW",
-        "big": true
-    },
-    {
-        "title": "ASTHMA3",
         "big": true
     },
     {

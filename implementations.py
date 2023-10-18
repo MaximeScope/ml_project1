@@ -22,7 +22,7 @@ def least_squares(y, tx):
     (array([ 0.21212121, -0.12121212]), 8.666684749742561e-33)
     """
 
-    w = np.linalg.solve(tx.T@tx, tx.T@y)
+    w = np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
     mse = 1/(2*len(y))*(y - tx@w).T@(y - tx@w)
     return w, mse
 
