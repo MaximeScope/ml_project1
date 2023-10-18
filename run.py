@@ -44,7 +44,7 @@ for col_index in range(x_train_f2.shape[1]):
     x_train_f2[nan_indices, col_index] = col_mean
 # Generate the weights and the mse:
 #!! The least squares doesn't work here (Singular matrix) => the ridge regression is needed?
-# weights, mse = implementations.least_squares(y_train, x_train_f2) # det = 0 ?
+#weights, mse = implementations.least_squares(y_train, x_train_f2) # det = 0 ?
 # Temporary solution: using a pseudo-inverse method:
 weights = np.dot(np.linalg.pinv(x_train_f2.T.dot(x_train_f2)), x_train_f2.T).dot(y_train)
 
