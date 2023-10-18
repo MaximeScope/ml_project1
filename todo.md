@@ -20,6 +20,11 @@
 
 - Write report
 
+---
+[ ] Ask TA's whether we can use pandas for the exploration only
+
+
+
 ## Features
 
 CELLFON3
