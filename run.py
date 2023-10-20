@@ -64,7 +64,6 @@ for col1 in range(1, x_train_f1.shape[1]):
 x_train_f2 = x_train_f1[:, columns_to_keep]
 # 'x_train_f2' now contains the columns that are not proportional to each other.
 
-
 ### 3 Train the model using least squares:
 
 # Generate the weights and the mse:
@@ -85,3 +84,7 @@ y_pred_norm[y_pred_norm > 0.5] = 1
 y_pred_norm[y_pred_norm <= 0.5] = 0
 # Store the predictions in a submission_file.csv in CSV format without index_label
 helpers.create_csv_submission(y_pred_norm, 'submission_file.csv')
+
+### 5. Train model using ridge regression
+w, rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, 0, 5), 1)
+print("best w: " + str(w) + " with rmse " + str(rmse))
