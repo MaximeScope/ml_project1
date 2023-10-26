@@ -339,8 +339,8 @@ def create_csv_submission(y_pred, name):
                name (string name of .csv output file to be created)
     """
     with open(name, "w") as csvfile:
-        fieldnames = ["Prediction"]
+        fieldnames = ["_MICHD"]
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
         for r1 in y_pred:
-            writer.writerow({"Prediction": int(r1)})
+            writer.writerow({"_MICHD": int(r1)})
