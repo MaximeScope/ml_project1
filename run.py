@@ -1,17 +1,14 @@
 import numpy as np
-import csv
 import helpers
 import implementations
 
 
 ### 1. Load the training data into feature matrix and class labels
 
-# x_train = helpers.load_x('data/x_train.csv')
-# y_train = helpers.load_y('data/y_train.csv')
 x_train_head = np.genfromtxt('data/x_train.csv', delimiter=",", dtype=str, max_rows=1)
-x_train = np.genfromtxt('data/x_train.csv', delimiter=",", skip_header=1)
-y_train = np.genfromtxt('data/y_train.csv', skip_header=1)
+x_train_head = x_train_head[1:]
 
+x_train, x_test, y_train, train_ids, test_ids = helpers.load_csv_data("data")
 
 ### 2. Filter the features:
 
@@ -30,17 +27,22 @@ for col_index in range(len(list(x_train_head))):
         indexes_to_delete.append(col_index)
 
 x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
+x_test = np.delete(x_test, indexes_to_delete, axis=1)
 
 # Second filter:
 
 # Replace NaN values with the mean of the column:
 for col_index in range(x_train_f1.shape[1]):
-    # Find the indices of NaN values in the current column
-    nan_indices = np.isnan(x_train_f1[:, col_index])
-    # Calculate the mean of the current column, ignoring NaN values
+    # Find the indices of NaN values in the current column of x_train_f1
+    nan_indices_train_f1 = np.isnan(x_train_f1[:, col_index])
+    # Find the indices of NaN values in the current column of x_test
+    nan_indices_test = np.isnan(x_test[:, col_index])
+    # Calculate the mean of the current column of x_train_f1, ignoring NaN values
     col_mean = np.nanmean(x_train_f1[:, col_index])
-    # Replace NaN values in the current column with the column mean
-    x_train_f1[nan_indices, col_index] = col_mean
+    # Replace NaN values in the current column of x_train_f1 with the column mean of x_train_f1
+    x_train_f1[nan_indices_train_f1, col_index] = col_mean
+    # Replace NaN values in the current column of x_test with the column mean of x_train_f1
+    x_test[nan_indices_test, col_index] = col_mean
 
 tolerance = 1e-8  # Tolerance for comparing scalar multiples (adjust as needed)
 
@@ -64,6 +66,9 @@ for col1 in range(1, x_train_f1.shape[1]):
 x_train_f2 = x_train_f1[:, columns_to_keep]
 # 'x_train_f2' now contains the columns that are not proportional to each other.
 
+# Filter x_test with the columns that we kept from the training data
+x_test = x_test[:, columns_to_keep]
+
 ### 3 Train the model using least squares:
 
 # Generate the weights and the mse:
@@ -76,14 +81,16 @@ weights, _ = implementations.least_squares(y_train, x_train_f2)
 # print("Length of filter1: "+str(len(filter1)))
 # print("Shape of x_train_f2: "+str(x_train_f2.shape))
 # print("Shape of the weights: "+str(weights.shape))
-y_pred = x_train_f2.dot(weights)
-# Transform the predictions with values from 0 to 1
-y_pred_norm = (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min())
-# If the value is above 0.5, consider it to be 1 and otherwise 0
-y_pred_norm[y_pred_norm > 0.5] = 1
-y_pred_norm[y_pred_norm <= 0.5] = 0
+y_pred = x_test.dot(weights)
+# Transform the predictions with values from -1 to 1
+y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
+print("y_pred_norm: "+str(y_pred_norm))
+# If the value is above 0, consider it to be 1 and otherwise -1
+y_pred_norm[y_pred_norm > 0] = 1
+y_pred_norm[y_pred_norm <= 0] = -1
+print("y_pred_norm: "+str(y_pred_norm))
 # Store the predictions in a submission_file.csv in CSV format without index_label
-helpers.create_csv_submission(y_pred_norm, 'submission_file.csv')
+helpers.create_csv_submission(test_ids, y_pred_norm, 'submission_file.csv')
 
 ### 5. Train model using ridge regression
 w, rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, 0, 5), 1)
