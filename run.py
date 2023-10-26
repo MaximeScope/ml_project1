@@ -68,7 +68,7 @@ x_test = x_test[:, columns_to_keep]
 
 # Weights from ridge regression
 weights, rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, 0, 5), 1)
-print("best w: " + str(w) + " with rmse " + str(rmse))
+print("best w: " + str(weights) + " with rmse " + str(rmse))
 
 ### 4. Make predictions:
 
