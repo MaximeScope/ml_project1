@@ -122,3 +122,5 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
 
     return w, loss
 
+
+# I want a function that takes c_
