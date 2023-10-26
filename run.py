@@ -5,10 +5,7 @@ import implementations
 
 ### 1. Load the training data into feature matrix and class labels
 
-x_train_head = np.genfromtxt('data/x_train.csv', delimiter=",", dtype=str, max_rows=1)
-x_train_head = x_train_head[1:]
-
-x_train, x_test, y_train, train_ids, test_ids = helpers.load_csv_data("data")
+x_train, x_train_head, x_test, y_train, train_ids, test_ids = helpers.load_csv_data("data")
 
 ### 2. Filter the features:
 
@@ -20,14 +17,7 @@ filter1 = ['GENHLTH', 'PHYSHLTH', 'MENTHLTH', 'POORHLTH', 'HLTHPLN1', 'PERSDOC2'
 #        'CHCKIDNY', 'EMPLOY1', 'CHCCOPD1', '_LMTSCL1', 'DIABETE3', 'MENTHLTH',
 #        '_RFHLTH', 'USEEQUIP', 'DIFFDRES']
 
-indexes_to_delete = []
-
-for col_index in range(len(list(x_train_head))):
-    if list(x_train_head)[col_index] in filter1:
-        indexes_to_delete.append(col_index)
-
-x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
-x_test = np.delete(x_test, indexes_to_delete, axis=1)
+x_train_f1, x_test = helpers.first_filter(x_train, x_train_head, x_test, filter1)
 
 # Second filter:
 
@@ -73,22 +63,17 @@ x_test = x_test[:, columns_to_keep]
 
 # Generate the weights and the mse:
 
-# weights = np.dot(np.linalg.inv(x_train_f2.T.dot(x_train_f2)), x_train_f2.T).dot(y_train)
-weights, _ = implementations.least_squares(y_train, x_train_f2)
+# Weights from least squares
+# weights, _ = implementations.least_squares(y_train, x_train_f2)
+
+# Weights from ridge regression
+weights, rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, 0, 5), 1)
+print("best w: " + str(w) + " with rmse " + str(rmse))
 
 ### 4. Make predictions:
-# Use weights to predict which columns correlate the most with y_train
-# print("Length of filter1: "+str(len(filter1)))
-# print("Shape of x_train_f2: "+str(x_train_f2.shape))
-# print("Shape of the weights: "+str(weights.shape))
-y_pred = x_test.dot(weights)
-# Transform the predictions with values from -1 to 1
-y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
-print("y_pred_norm: "+str(y_pred_norm))
-# If the value is above 0, consider it to be 1 and otherwise -1
-y_pred_norm[y_pred_norm > 0] = 1
-y_pred_norm[y_pred_norm <= 0] = -1
-print("y_pred_norm: "+str(y_pred_norm))
+
+y_pred_norm = helpers.make_predictions(weights, x_test)
+
 # Store the predictions in a submission_file.csv in CSV format without index_label
 helpers.create_csv_submission(test_ids, y_pred_norm, 'submission_file.csv')
 

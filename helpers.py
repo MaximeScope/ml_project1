@@ -29,7 +29,7 @@ def load_csv_data(data_path, sub_sample=False):
         usecols=1,
     )
     x_train = np.genfromtxt(
-        os.path.join(data_path, "x_train.csv"), delimiter=",", skip_header=1
+        os.path.join(data_path, "x_train.csv"), delimiter=","
     )
     x_test = np.genfromtxt(
         os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1
@@ -37,7 +37,8 @@ def load_csv_data(data_path, sub_sample=False):
 
     train_ids = x_train[:, 0].astype(dtype=int)
     test_ids = x_test[:, 0].astype(dtype=int)
-    x_train = x_train[:, 1:]
+    x_train = x_train[1:, 1:]
+    x_train_head = x_train[0, 1:].astype(dtype=str)
     x_test = x_test[:, 1:]
 
     # sub-sample
@@ -46,7 +47,7 @@ def load_csv_data(data_path, sub_sample=False):
         x_train = x_train[::50]
         train_ids = train_ids[::50]
 
-    return x_train, x_test, y_train, train_ids, test_ids
+    return x_train, x_train_head, x_test, y_train, train_ids, test_ids
 
 
 def build_k_indices(y, k_fold, seed):
@@ -337,6 +338,31 @@ def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
     loss, gradient = penalized_logistic_regression(y, tx, w, lambda_)
     w = w - gamma * gradient
     return loss, w
+
+
+def first_filter(x_train, x_train_head, x_test, filter):
+    indexes_to_delete = []
+
+    for col_index in range(len(list(x_train_head))):
+        if list(x_train_head)[col_index] in filter:
+            indexes_to_delete.append(col_index)
+
+    x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
+    x_test = np.delete(x_test, indexes_to_delete, axis=1)
+    
+    return x_train_f1, x_test
+
+
+def make_predictions(weights, x_test):
+    # Use weights to predict which columns correlate the most with y_train
+    y_pred = x_test.dot(weights)
+    # Transform the predictions with values from -1 to 1
+    y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
+    # If the value is above 0, consider it to be 1 and otherwise -1
+    y_pred_norm[y_pred_norm > 0] = 1
+    y_pred_norm[y_pred_norm <= 0] = -1
+    
+    return y_pred_norm
 
 
 def create_csv_submission(ids, y_pred, name):
