@@ -1,16 +1,69 @@
 """Some helper functions for project 1."""
 import csv
 import numpy as np
-
+import os
 import implementations
 
-def load(data_path, sub_sample=False):
-    headers = np.genfromtxt('data/x_train.csv', delimiter=",", dtype=str, max_rows=1)
+def load_csv_data(data_path, sub_sample=False):
+    """
+    This function loads the data and returns the respectinve numpy arrays.
+    Remember to put the 3 files in the same folder and to not change the names of the files.
+
+    Args:
+        data_path (str): datafolder path
+        sub_sample (bool, optional): If True the data will be subsempled. Default to False.
+
+    Returns:
+        x_train (np.array): training data
+        x_test (np.array): test data
+        y_train (np.array): labels for training data in format (-1,1)
+        train_ids (np.array): ids of training data
+        test_ids (np.array): ids of test data
+    """
     if sub_sample:
-        data = np.genfromtxt('data/x_train.csv', delimiter=",", skip_header=1, max_rows=100)
+        y_train = np.genfromtxt(
+            os.path.join(data_path, "y_train.csv"),
+            delimiter=",",
+            skip_header=1,
+            dtype=int,
+            usecols=1,
+            max_rows=10000
+        )
+        x_train = np.genfromtxt(
+            os.path.join(data_path, "x_train.csv"), delimiter=",", max_rows=10000
+        )
+        x_test = np.genfromtxt(
+            os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1, max_rows=10000
+        )
     else:
-        data = np.genfromtxt('data/x_train.csv', delimiter=",", skip_header=1)
-    return data, headers
+        y_train = np.genfromtxt(
+            os.path.join(data_path, "y_train.csv"),
+            delimiter=",",
+            skip_header=1,
+            dtype=int,
+            usecols=1,
+        )
+        x_train = np.genfromtxt(
+            os.path.join(data_path, "x_train.csv"), delimiter=","
+        )
+        x_test = np.genfromtxt(
+            os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1
+        )
+
+    train_ids = x_train[:, 0].astype(dtype=int)
+    test_ids = x_test[:, 0].astype(dtype=int)
+    x_train = x_train[1:, 1:]
+    x_train_head = x_train[0, 1:].astype(dtype=str)
+    x_test = x_test[:, 1:]
+
+    # sub-sample
+    if sub_sample:
+        y_train = y_train[::50]
+        x_train = x_train[::50]
+        train_ids = train_ids[::50]
+
+    return x_train, x_train_head, x_test, y_train, train_ids, test_ids
+
 
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold.
@@ -19,6 +72,8 @@ def build_k_indices(y, k_fold, seed):
         y:      shape=(N,)
         k_fold: K in K-fold, i.e. the fold num
         seed:   the random seed
+
+
 
     Returns:
         A 2D array of shape=(k_fold, N/k_fold) that indicates the data indices for each fold
@@ -302,55 +357,90 @@ def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
     return loss, w
 
 
-def create_csv_submission(y_pred, name):
+def first_filter(x_train, x_train_head, x_test, filter):
+    indexes_to_delete = []
+
+    for col_index in range(len(list(x_train_head))):
+        if list(x_train_head)[col_index] in filter:
+            indexes_to_delete.append(col_index)
+
+    x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
+    x_test = np.delete(x_test, indexes_to_delete, axis=1)
+    
+    return x_train_f1, x_test
+
+
+def make_predictions(weights, x_test):
+    # Use weights to predict which columns correlate the most with y_train
+    y_pred = x_test.dot(weights)
+    # Transform the predictions with values from -1 to 1
+    y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
+    # If the value is above 0, consider it to be 1 and otherwise -1
+    y_pred_norm[y_pred_norm > 0] = 1
+    y_pred_norm[y_pred_norm <= 0] = -1
+    
+    return y_pred_norm
+
+
+def create_csv_submission(ids, y_pred, name):
     """
-    Creates an output file in .csv format for submission to Kaggle or AIcrowd
-    Arguments: ids (event ids associated with each prediction)
-               y_pred (predicted class labels)
-               name (string name of .csv output file to be created)
+    This function creates a csv file named 'name' in the format required for a submission in Kaggle or AIcrowd.
+    The file will contain two columns the first with 'ids' and the second with 'y_pred'.
+    y_pred must be a list or np.array of 1 and -1 otherwise the function will raise a ValueError.
+
+    Args:
+        ids (list,np.array): indices
+        y_pred (list,np.array): predictions on data correspondent to indices
+        name (str): name of the file to be created
     """
-    with open(name, "w") as csvfile:
-        fieldnames = ["Prediction"]
+    # Check that y_pred only contains -1 and 1
+    if not all(i in [-1, 1] for i in y_pred):
+        raise ValueError("y_pred can only contain values -1, 1")
+
+    with open(name, "w", newline="") as csvfile:
+        fieldnames = ["Id", "Prediction"]
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
-        for r1 in y_pred:
-            writer.writerow({"Prediction": int(r1)})
+        for r1, r2 in zip(ids, y_pred):
+            writer.writerow({"Id": int(r1), "Prediction": int(r2)})
 
-def replace_nan_with_median(x):
+def replace_nan_with_median(x_train, x_test):
     """
-    Replace NaN values in the input matrix with the column median
+    Replace NaN values with the median of the column
     Args:
-        x: numpy array of shape (N,D), D is the number of features.
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
     Returns:
-        x: numpy array of shape (N,D), D is the number of features.
-        col_medians: list of length D containing the median of each column 
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
     """
-    col_medians = []
-    for col in range(x.shape[1]):
-        nan_indices = np.isnan(x[:, col])
-        col_median = np.nanmedian(x[:, col])
-        x[nan_indices, col] = col_median
-        col_medians.append(col_median)
-    return x, col_medians
 
-def second_filter(x, tol=1e-8):
+    for col in range(x_train.shape[1]):
+        nan_indices_train = np.isnan(x_train[:, col])
+        nan_indices_test = np.isnan(x_test[:, col])
+        col_median_train = np.nanmedian(x_train[:, col])
+        x_train[nan_indices_train, col] = col_median_train
+        x_test[nan_indices_test, col] = col_median_train
+    return x_train, x_test
+
+def second_filter(x_train, x_test, tol=1e-8):
     """
-    Filter the columns of the input matrix that are equal to each other within tol
+    Filter the features that are proportional to each other
     Args:
-        x: numpy array of shape (N,D), D is the number of features.
-        tol: tolerance for the equality test
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
+        tol: tolerance for the allclose function
     Returns:
-        x: numpy array of shape (N,D'), D' is the number of features after filtering.
-        cols_filtered: list of length D' containing the indices of the columns to keep
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
     """
     cols_filtered = []
-    # Iterate through the columns, starting from the second column
-    for col1 in range(1, x.shape[1]):
+    for col1 in range(1, x_train.shape[1]):
         is_prop = False  
         for col2 in cols_filtered:
-            if np.allclose(x[:, col1], x[:, col2], atol=tol):
+            if np.allclose(x_train[:, col1], x_train[:, col2], atol=tol):
                 is_prop = True
                 break
         if not is_prop:
             cols_filtered.append(col1)
-    return x[:, cols_filtered], cols_filtered
+    return x_train[:, cols_filtered], x_test[:, cols_filtered]
