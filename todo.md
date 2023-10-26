@@ -1,5 +1,14 @@
 # All tasks todo
 
+- Fix ID problem
+- Finish one-hot encoding of categorical features
+- Finish feature selection to get
+- Implement the logistic regression
+- Hyperparameter optimisation with cross-validation
+
+
+
+
 - Exploratory data analysis and cleaning
   [x] Manually clean out irrevelent features
   [x] Create an first filtered tx based on json
