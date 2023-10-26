@@ -27,25 +27,19 @@ for col_index in range(len(list(x_train_head))):
     if list(x_train_head)[col_index] in filter1:
         indexes_to_delete.append(col_index)
 x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
-# print(x_train.shape)
-# print(len(filter1))
-# print(x_train_f1.shape)
-# Second filter:
-x_train_f2 = x_train_f1 # To-do with correlation
 
-### 3 Train the model using least squares:
 # Replace NaN values with the mean of the column:
-for col_index in range(x_train_f2.shape[1]):
-    # Find the indices of NaN values in the current column
-    nan_indices = np.isnan(x_train_f2[:, col_index])
-    # Calculate the mean of the current column, ignoring NaN values
-    col_mean = np.nanmean(x_train_f2[:, col_index])
-    # Replace NaN values in the current column with the column mean
-    x_train_f2[nan_indices, col_index] = col_mean
+x_train, col_medians = helpers.replace_nan_with_median(x_train_f1)
+
+# Second filter
+x_train_f2 = helpers.second_filter(x_train_f1)
+
+
 # Generate the weights and the mse:
 #!! The least squares doesn't work here (Singular matrix) => the ridge regression is needed?
 # weights, mse = implementations.least_squares(y_train, x_train_f2) # det = 0 ?
 # Temporary solution: using a pseudo-inverse method:
+### 3 Train the model using least squares:
 weights = np.dot(np.linalg.pinv(x_train_f2.T.dot(x_train_f2)), x_train_f2.T).dot(y_train)
 
 ### 4. Make predictions:

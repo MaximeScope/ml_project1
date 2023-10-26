@@ -315,3 +315,42 @@ def create_csv_submission(y_pred, name):
         writer.writeheader()
         for r1 in y_pred:
             writer.writerow({"Prediction": int(r1)})
+
+def replace_nan_with_median(x):
+    """
+    Replace NaN values in the input matrix with the column median
+    Args:
+        x: numpy array of shape (N,D), D is the number of features.
+    Returns:
+        x: numpy array of shape (N,D), D is the number of features.
+        col_medians: list of length D containing the median of each column 
+    """
+    col_medians = []
+    for col in range(x.shape[1]):
+        nan_indices = np.isnan(x[:, col])
+        col_median = np.nanmedian(x[:, col])
+        x[nan_indices, col] = col_median
+        col_medians.append(col_median)
+    return x, col_medians
+
+def second_filter(x, tol=1e-8):
+    """
+    Filter the columns of the input matrix that are equal to each other within tol
+    Args:
+        x: numpy array of shape (N,D), D is the number of features.
+        tol: tolerance for the equality test
+    Returns:
+        x: numpy array of shape (N,D'), D' is the number of features after filtering.
+        cols_filtered: list of length D' containing the indices of the columns to keep
+    """
+    cols_filtered = []
+    # Iterate through the columns, starting from the second column
+    for col1 in range(1, x.shape[1]):
+        is_prop = False  
+        for col2 in cols_filtered:
+            if np.allclose(x[:, col1], x[:, col2], atol=tol):
+                is_prop = True
+                break
+        if not is_prop:
+            cols_filtered.append(col1)
+    return x[:, cols_filtered], cols_filtered
