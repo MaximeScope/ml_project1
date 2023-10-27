@@ -248,7 +248,10 @@ def calculate_nll(y, tx, w):
 
     sum = 0
     for i in range(y.shape[0]):
-        sum += - y[i]*tx[i].dot(w) - np.log(1-sigmoid(tx[i].dot(w)))
+        sig_val = 1 + np.exp(-y[i]*tx[i].dot(w))
+        if sig_val == 0:
+            return np.inf
+        sum += np.log(sig_val)
     return sum / y.shape[0]
 
 

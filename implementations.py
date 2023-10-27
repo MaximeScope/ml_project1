@@ -116,6 +116,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
             print("Stopping at iteration" + str(iter))
             loss = prev_loss
             w = prev_w
+            break
+        prev_w = w
+        prev_loss = loss
 
     return w, loss
 
