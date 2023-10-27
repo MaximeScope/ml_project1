@@ -3,7 +3,7 @@ import helpers
 import random
 
 
-def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
+def mean_squared_error_gd(y, tx, initial_w, max_iters=10000, gamma=0.5):
     """The Gradient Descent (GD) algorithm.
 
         Args:
@@ -30,7 +30,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 
-def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
+def mean_squared_error_sgd(y, tx, initial_w, max_iters=10000, gamma=0.5):
     """The Stochastic Gradient Descent algorithm (SGD).
 
     Args:
@@ -103,7 +103,7 @@ def ridge_regression(y, tx, lambda_):
                            np.transpose(tx).dot(y))
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, max_iters=10000, gamma=0.5):
     w = initial_w
     loss = 0
     for iter in range(max_iters):
@@ -121,6 +121,3 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         loss, w = helpers.learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
 
     return w, loss
-
-
-# I want a function that takes c_

@@ -21,9 +21,15 @@ x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1)
 # Weights from least squares
 # weights, _ = implementations.least_squares(y_train, x_train_f2)
 
-# Weights from ridge regression
-weights, rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, 0, 5), 1)
-print("best w: " + str(weights) + " with rmse " + str(rmse))
+k_folds = 2
+lambdas = np.logspace(-4, -1, 4)
+gammas = np.logspace(-3, 0, 4)
+max_iters=1000
+
+weights, rmse, best_lambda = helpers.train_ridge_regression(y_train, x_train_f2, k_folds, lambdas, 1)
+weights, loss = helpers.train_reg_logistic_regression(y_train, x_train_f2, weights, best_lambda, gammas, max_iters)
+print("Results from regression:")
+print("best w: " + str(weights) + " with loss " + str(loss))
 
 # 4. Make predictions:
 y_pred_norm = helpers.make_predictions(weights, x_test_f2)

@@ -134,11 +134,12 @@ def train_ridge_regression(y, x, k_fold, lambdas, seed):
 
         curr_rmse = loss_te_sum / k_fold
         if curr_rmse < best_rmse:
-            print("Got best w with lambda " + str(lambda_) + " with rmse " + str(curr_rmse))
+            print("Got best w with lambda " + str(lambda_) + " and rmse " + str(curr_rmse))
             best_rmse = curr_rmse
             best_w = w_sum / k_fold
+            best_lambda = lambda_
 
-    return best_w, best_rmse
+    return best_w, best_rmse, best_lambda
 
 
 def compute_mse(y, tx, w):
@@ -208,7 +209,7 @@ def calculate_nll(y, tx, w):
     sum = 0
     for i in range(y.shape[0]):
         sum += - y[i]*tx[i].dot(w) - np.log(1-sigmoid(tx[i].dot(w)))
-    return sum[0] / y.shape[0]
+    return sum / y.shape[0]
 
 
 def calculate_nll_gradient(y, tx, w):
@@ -445,3 +446,16 @@ def second_filter(x_train, x_test, tol=1e-3):
         if not is_prop:
             cols_filtered.append(col1)
     return x_train[:, cols_filtered], x_test[:, cols_filtered]
+
+
+def train_reg_logistic_regression(y, x, w, lambda_, gammas, max_iters):
+    losses = [99999]
+    best_w = w
+    for gamma in gammas:
+        print("Checking gamma: " + str(gamma))
+        curr_w, loss = implementations.reg_logistic_regression(y, x, lambda_, w, max_iters, gamma)
+        if loss < np.argmin(losses):
+            print("Got best w with gamma " + str(gamma) + " and loss " + str(loss))
+            best_w = curr_w
+        losses.append(loss)
+    return best_w, np.argmin(losses)
