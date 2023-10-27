@@ -117,6 +117,24 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
     return loss_te, w
 
 
+def cross_validation(y, x, k_indices, k, function, param, initial_w=None, max_iters=None):
+    test_x = np.array([x[i] for i in k_indices[k]])
+    test_y = np.array([y[i] for i in k_indices[k]])
+    train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
+    train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
+
+    if initial_w is None:
+        w, _ = function(train_y, train_x, param)
+    else:
+        w, _ = function(train_y, train_x, initial_w, max_iters, param)
+
+    print(w)
+    print(test_y.shape)
+    print(test_x.shape)
+    loss_te = np.sqrt(np.mean((test_y - test_x.dot(w)) ** 2))
+    return loss_te, w
+
+
 def train_ridge_regression(y, x, k_fold, lambdas, seed):
     k_indices = build_k_indices(y, k_fold, seed)
 
@@ -140,6 +158,27 @@ def train_ridge_regression(y, x, k_fold, lambdas, seed):
     return best_w, best_rmse
 
 
+def train_model(y, x, k_fold, seed, function, params, initial_w=None, max_iters=None):
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    best_rmse = 99999
+    best_w = np.zeros(x.shape[1])
+    for param in params:
+        loss_te_sum = 0
+        w_sum = np.zeros(x.shape[1])
+        for k in range(k_fold):
+            loss_te, w = cross_validation(y, x, k_indices, k, function, param, initial_w, max_iters)
+            loss_te_sum += loss_te
+            w_sum += w
+
+        curr_rmse = loss_te_sum / k_fold
+        if curr_rmse < best_rmse:
+            best_rmse = curr_rmse
+            best_w = w_sum / k_fold
+
+    return best_w, best_rmse
+
+
 def compute_mse(y, tx, w):
     """Calculate the loss using either MSE or MAE.
 
@@ -151,6 +190,8 @@ def compute_mse(y, tx, w):
     Returns:
         the value of the loss (a scalar), corresponding to the input parameters w.
     """
+    print(tx.shape)
+    print(w.shape)
     return np.mean((y - tx.dot(w)) ** 2) / 2
 
 def compute_gradient(y, tx, w):
@@ -207,7 +248,7 @@ def calculate_nll(y, tx, w):
     sum = 0
     for i in range(y.shape[0]):
         sum += - y[i]*tx[i].dot(w) - np.log(1-sigmoid(tx[i].dot(w)))
-    return sum[0] / y.shape[0]
+    return sum / y.shape[0]
 
 
 def calculate_nll_gradient(y, tx, w):
@@ -252,11 +293,13 @@ def calculate_hessian(y, tx, w):
            [0.3861498 , 0.62182124, 0.85749269],
            [0.48268724, 0.85749269, 1.23229813]])
     """
-    s = np.zeros((y.shape[0], y.shape[0]))
+    tx_transpose_dot_s = np.zeros((tx.shape[1], tx.shape[0]))
     for i in range(y.shape[0]):
-        sig = sigmoid(tx[i].dot(w))[0]
-        s[i][i] = sig * (1 - sig)
-    return tx.transpose().dot(s).dot(tx) / y.shape[0]
+        sig = sigmoid(tx[i].dot(w))
+        s_val = sig * (1 - sig)
+        for j in range(tx.shape[1]):
+            tx_transpose_dot_s[j][i] = tx[i][j] * s_val
+    return tx_transpose_dot_s.dot(tx) / y.shape[0]
 
 
 def learning_by_newton_method(y, tx, w, gamma):
