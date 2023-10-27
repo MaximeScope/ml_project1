@@ -20,6 +20,16 @@ def load_csv_data(data_path, sub_sample=False):
         train_ids (np.array): ids of training data
         test_ids (np.array): ids of test data
     """
+    x_train_head = np.genfromtxt(
+        os.path.join(data_path, "x_train.csv"), 
+        delimiter=",", 
+        max_rows=1,
+        dtype=str
+    )
+    x_test = np.genfromtxt(
+        os.path.join(data_path, "x_test.csv"), delimiter=",",
+        skip_header=1
+    )
     if sub_sample:
         y_train = np.genfromtxt(
             os.path.join(data_path, "y_train.csv"),
@@ -30,10 +40,10 @@ def load_csv_data(data_path, sub_sample=False):
             max_rows=10000
         )
         x_train = np.genfromtxt(
-            os.path.join(data_path, "x_train.csv"), delimiter=",", max_rows=10000
-        )
-        x_test = np.genfromtxt(
-            os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1, max_rows=10000
+            os.path.join(data_path, "x_train.csv"), 
+            delimiter=",",
+            skip_header=1,
+            max_rows=10000
         )
     else:
         y_train = np.genfromtxt(
@@ -44,24 +54,15 @@ def load_csv_data(data_path, sub_sample=False):
             usecols=1,
         )
         x_train = np.genfromtxt(
-            os.path.join(data_path, "x_train.csv"), delimiter=","
+            os.path.join(data_path, "x_train.csv"), 
+            delimiter=",",
+            skip_header=1,
         )
-        x_test = np.genfromtxt(
-            os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1
-        )
-
     train_ids = x_train[:, 0].astype(dtype=int)
     test_ids = x_test[:, 0].astype(dtype=int)
-    x_train = x_train[1:, 1:]
-    x_train_head = x_train[0, 1:].astype(dtype=str)
+    x_train = x_train[:, 1:]
     x_test = x_test[:, 1:]
-
-    # sub-sample
-    if sub_sample:
-        y_train = y_train[::50]
-        x_train = x_train[::50]
-        train_ids = train_ids[::50]
-
+        
     return x_train, x_train_head, x_test, y_train, train_ids, test_ids
 
 
@@ -404,13 +405,13 @@ def first_filter(x_train, x_train_head, x_test, filter):
     indexes_to_delete = []
 
     for col_index in range(len(list(x_train_head))):
-        if list(x_train_head)[col_index] in filter:
+        if list(x_train_head)[col_index] not in filter:
             indexes_to_delete.append(col_index)
 
     x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
-    x_test = np.delete(x_test, indexes_to_delete, axis=1)
+    x_test_f1 = np.delete(x_test, indexes_to_delete, axis=1)
     
-    return x_train_f1, x_test
+    return x_train_f1, x_test_f1
 
 
 def make_predictions(weights, x_test):
@@ -466,7 +467,7 @@ def replace_nan_with_median(x_train, x_test):
         x_test[nan_indices_test, col] = col_median_train
     return x_train, x_test
 
-def second_filter(x_train, x_test, tol=1e-8):
+def second_filter(x_train, x_test, tol=1e-3):
     """
     Filter the features that are proportional to each other
     Args:
@@ -477,11 +478,11 @@ def second_filter(x_train, x_test, tol=1e-8):
         x_train: numpy array of shape (N,D), D is the number of features.
         x_test: numpy array of shape (N,D), D is the number of features.
     """
-    cols_filtered = []
+    cols_filtered = [0]
     for col1 in range(1, x_train.shape[1]):
         is_prop = False  
         for col2 in cols_filtered:
-            if np.allclose(x_train[:, col1], x_train[:, col2], atol=tol):
+            if np.allclose(x_train[:, col1], x_train[:, col2], rtol=tol):
                 is_prop = True
                 break
         if not is_prop:
