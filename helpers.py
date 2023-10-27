@@ -414,16 +414,23 @@ def first_filter(x_train, x_train_head, x_test, filter):
     return x_train_f1, x_test_f1
 
 
-def make_predictions(weights, x_test):
-    # Use weights to predict which columns correlate the most with y_train
+def make_predictions_linear_regression(weights, x_test):
     y_pred = x_test.dot(weights)
+
     # Transform the predictions with values from -1 to 1
     y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
-    # If the value is above 0, consider it to be 1 and otherwise -1
+
     y_pred_norm[y_pred_norm > 0] = 1
     y_pred_norm[y_pred_norm <= 0] = -1
     
     return y_pred_norm
+
+def make_predictions_logistic_regression(weights, x_test):
+    y_pred = sigmoid(x_test.dot(weights))
+    y_pred[y_pred <= 0.5] = -1
+    y_pred[y_pred > 0.5] = 1
+    
+    return y_pred
 
 
 def create_csv_submission(ids, y_pred, name):
@@ -488,3 +495,93 @@ def second_filter(x_train, x_test, tol=1e-3):
         if not is_prop:
             cols_filtered.append(col1)
     return x_train[:, cols_filtered], x_test[:, cols_filtered]
+
+def process_labels(y):
+    y[y == -1] = 0
+    y[y == 1] = 1 
+    return y    
+
+def onehot_encode_col(x_trainj, x_testj):
+    unique = np.unique(x_trainj)
+    x_trainj_onehot = np.zeros((len(x_trainj), len(unique)))
+    x_testj_onehot = np.zeros((len(x_testj), len(unique)))
+
+    for j in range(len(x_trainj)):
+        x_trainj_onehot[j, np.where(unique == x_trainj[j])] = 1
+
+    for j in range(len(x_testj)):
+        x_testj_onehot[j, np.where(unique == x_testj[j])] = 1
+
+    return x_trainj_onehot, x_testj_onehot
+
+def standardize_col(x_trainj, x_testj):
+    mean = np.mean(x_trainj)
+    std = np.std(x_trainj)
+    x_trainj = (x_trainj - mean)/std + .5
+    x_testj = (x_testj - mean)/std + .5
+
+    return x_trainj.reshape(len(x_trainj), -1), x_testj.reshape(len(x_testj), -1)
+
+def process_features(x_train, x_test, onehot_thresh=100):
+    x_train_processed = np.zeros((x_train.shape[0], 0))
+    x_test_processed = np.zeros((x_test.shape[0], 0))
+
+    for j in range(x_train.shape[1]):
+        num_uniquej = len(np.unique(x_train[:, j]))
+
+        # onehot encode if number of unique values is less than onehot_thresh
+        if (num_uniquej <= onehot_thresh):
+            x_trainj_onehot, x_testj_onehot = onehot_encode_col(x_train[:, j], x_test[:, j])
+            x_train_processed = np.hstack((x_train_processed, x_trainj_onehot))
+            x_test_processed = np.hstack((x_test_processed, x_testj_onehot))
+            print(f'Feature index {j} has {num_uniquej} unique values --> onehot encoding')
+
+        else:  
+        # standardize if number of unique values is greater than onehot_thresh
+            x_trainj_standardized, x_testj_standardized = standardize_col(x_train[:, j], x_test[:, j])
+            x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
+            x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
+            print(f'Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing')
+
+    return x_train_processed, x_test_processed
+
+def shuffle_data(x, y):
+    """Shuffle the data"""
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    return x[shuffle_indices], y[shuffle_indices]
+
+def balance_data(x_train, y_train):
+    """
+    Balance the data such that there are equal number of y_train entries = 0 and y_train entries = 1
+    Args:
+        x_train: input data
+        y_train: output data (0 or 1)
+    Returns:
+        x_train_b: balanced input data
+        y_train_b: balanced output data
+    """
+    # Count number of y_train entries = 1
+    tot_ytrain1 = len(y_train[y_train == 1]) 
+
+    # Create data subset such that there are equal number of y_train entries = 0 and y_train entries = 1
+    x_train_b = []
+    y_train_b = []
+    cnt_ytrain1 = 0
+    cnt_ytrain0 = 0
+    for i in range(len(y_train)):
+        if (y_train[i] == 1):
+            x_train_b.append(x_train[i])
+            y_train_b.append(y_train[i])
+            cnt_ytrain1 += 1
+        elif (y_train[i] == 0):
+            if (cnt_ytrain0 < tot_ytrain1):
+                x_train_b.append(x_train[i])
+                y_train_b.append(y_train[i])
+                cnt_ytrain0 += 1
+
+    x_train_b = np.array(x_train_b)
+    y_train_b = np.array(y_train_b)
+    # Shuffle the data
+    x_train_b, y_train_b = shuffle_data(x_train_b, y_train_b)
+
+    return x_train_b, y_train_b 

@@ -103,24 +103,36 @@ def ridge_regression(y, tx, lambda_):
                            np.transpose(tx).dot(y))
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, gamma, max_iters=100, convergeance_thresh=1e-3):
     w = initial_w
-    loss = 0
+    prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
         loss, w = helpers.learning_by_newton_method(y, tx, w, gamma)
+        print(f'Current iteration={iter}, loss={loss}')
+
+        # convergeance check
+        if (prev_loss - loss) < convergeance_thresh:
+            print(f'Converged!')
+            break
+        else: 
+            prev_loss = loss
 
     return w, loss
 
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+def reg_logistic_regression(y, tx, initial_w, gamma, lambda_, max_iters=100, convergeance_thresh=1e-3):
     w = initial_w
-    loss = 0
+    prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
         loss, w = helpers.learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
+        print(f'Current iteration={iter}, loss={loss}')
 
+        # convergeance check
+        if (prev_loss - loss) < convergeance_thresh:
+            print(f'Converged!')
+            break
+        else: 
+            prev_loss = loss
     return w, loss
-
-
-# I want a function that takes c_
