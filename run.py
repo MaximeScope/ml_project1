@@ -22,9 +22,13 @@ x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1)
 # Weights from least squares
 # weights, _ = implementations.least_squares(y_train, x_train_f2)
 
+init_weights, init_rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, -3, 2), 1)
+print("best w: " + str(init_weights) + " with rmse " + str(init_rmse))
+
 # Weights from ridge regression
-weights, rmse = helpers.train_model(y_train, x_train_f2, 2, 1, implementations.logistic_regression,
-                                    np.logspace(-4, 0, 5), np.ones(x_train_f2.shape[1]), 20)
+#weights, rmse = helpers.train_model(y_train, x_train_f2, 2, 1, implementations.logistic_regression,
+#                                    np.logspace(-4, -3, 2), init_weights, 10)
+weights, rmse = implementations.logistic_regression(y_train, x_train_f2, init_weights, 100, 0.001)
 print("best w: " + str(weights) + " with rmse " + str(rmse))
 
 # 4. Make predictions:

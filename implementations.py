@@ -105,10 +105,17 @@ def ridge_regression(y, tx, lambda_):
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     w = initial_w
+    prev_w = initial_w
     loss = 0
+    prev_loss = helpers.calculate_nll(y, tx, w)
     for iter in range(max_iters):
         # get loss and update w.
         loss, w = helpers.learning_by_newton_method(y, tx, w, gamma)
+        print("got loss " + str(loss) + " for iteration " + str(iter))
+        if loss > prev_loss:
+            print("Stopping at iteration" + str(iter))
+            loss = prev_loss
+            w = prev_w
 
     return w, loss
 
