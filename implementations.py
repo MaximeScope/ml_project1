@@ -16,27 +16,16 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         w: shape=(D, 1)
         loss: scalar
     """
-    threshold = 1e-8
     w = initial_w
-    loss = 0
     n_iter = 0
-    prev_loss = np.inf
 
     for n_iter in range(max_iters):
         # Compute gradient and loss
-        loss = helpers.compute_mse(y, tx, w)
         gradient = helpers.compute_grad(y, tx, w)
-
         # Update w by loss
         w = w - gamma * gradient
-        # converge criterion
-        if (prev_loss != np.inf) and np.abs(prev_loss - loss) < threshold:
-            print(f"Converged with mse loss {loss} at iteration {iter}.")
-            break
-        prev_loss = loss
-    if n_iter == max_iters - 1:
-        print(f"Warning: reached max iterations {max_iters}.")
 
+    loss = helpers.compute_mse(y, tx, w)
     return w, loss
 
 
@@ -56,10 +45,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         ws: a list of length max_iters containing the model parameters as numpy arrays of shape (2, ), for each iteration of SGD
     """
     w = initial_w
-    loss = 0
-    threshold = 1e-8
     n_iter = 0
-    prev_loss = np.inf
 
     for n_iter in range(max_iters):
         # Get random data point
@@ -68,20 +54,11 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         tx_rand = np.array([tx[rand_index]])
 
         # Compute gradient and loss
-        loss = helpers.compute_mse(y_rand, tx_rand, w)
         gradient = helpers.compute_grad(y_rand, tx_rand, w)
 
         # Update w by loss
         w = w - gamma * gradient
-
-        # converge criterion
-        if (prev_loss != np.inf) and np.abs(prev_loss - loss) < threshold:
-            print(f"Converged with mse loss {loss} at iteration {iter}.")
-            break
-        prev_loss = loss
-    if n_iter == max_iters - 1:
-        print(f"Warning: reached max iterations {max_iters}.")
-
+    loss = helpers.compute_mse(y_rand, tx_rand, w)
     return w, loss
 
 
@@ -142,25 +119,15 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         gamma: float
     """
     # init parameters
-    threshold = 1e-4
-    prev_loss = np.inf
-    loss = 0
     w = initial_w
     iter = 0
 
     # start the logistic regression
     for iter in range(max_iters):
         # get loss, grad and update w.
-        loss = helpers.calculate_nll(y, tx, w)
         grad = helpers.calculate_grad_nll(y, tx, w)
         w = w - gamma * grad
-        # converge criterion
-        if (prev_loss != np.inf) and np.abs(prev_loss - loss) < threshold:
-            print(f"Converged with nnl loss {loss} at iteration {iter}.")
-            break
-        prev_loss = loss
-    if iter == max_iters - 1:
-        print(f"Warning: reached max iterations {max_iters}.")
+    loss = helpers.calculate_nll(y, tx, w)
     return w, loss
 
 
@@ -175,23 +142,12 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         gamma: float
     """
     # init parameters
-    threshold = 1e-4
-    prev_loss = np.inf
-    loss = 0
-    iter = 0
     w = initial_w
 
     # start the logistic regression
     for iter in range(max_iters):
         # get loss, grad and update w.
-        loss = helpers.calculate_nll(y, tx, w) + lambda_ * np.linalg.norm(w, 2) ** 2
         grad = helpers.calculate_grad_nll(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * grad
-        # converge criterion
-        if (prev_loss != np.inf) and np.abs(prev_loss - loss) < threshold:
-            print(f"Converged with nnl loss {loss} at iteration {iter}.")
-            break
-        prev_loss = loss
-    if iter == max_iters - 1:
-        print(f"Warning: reached max iterations {max_iters}.")
+    loss = helpers.calculate_nll(y, tx, w) + lambda_ / 2 * np.linalg.norm(w, 2) ** 2
     return w, loss
