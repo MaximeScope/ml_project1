@@ -33,9 +33,9 @@ x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 33)
 # weights, _ = implementations.least_squares(y_train, x_train_f2)
 
 # Weights from ridge regression
-# weights, rmse = helpers.train_model(y_train, x_train_f2, 2, 1, implementations.logistic_regression,
-#                                     np.logspace(-4, 0, 5), np.ones(x_train_f2.shape[1]), 20)
-# print("best w: " + str(weights) + " with rmse " + str(rmse))
+weights, rmse = helpers.train_model(y_train_p, x_train_p, 2, 1, implementations.ridge_regression,
+                                    np.logspace(-4, 0, 5))
+print("best w: " + str(weights) + " with rmse " + str(rmse))
 weights, _ = implementations.reg_logistic_regression(y_train_p, 
                                         x_train_p,
                                         initial_w=np.zeros(x_train_p.shape[1]) + 1e-1, 
