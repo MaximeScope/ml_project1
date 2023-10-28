@@ -108,43 +108,62 @@ def ridge_regression(y, tx, lambda_):
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
-       meaning that the regression has "converged".
     """
-    convergeance_thresh = 1e-4
+    Logistic regression using gradient descent or SGD
+    Args:
+        y:  shape=(N, 1)
+        tx: shape=(N, D)
+        initial_w: shape=(D, 1)
+        max_iters: int
+        gamma: float
+    """
+    # init parameters
+    threshold = 1e-4
+    prev_loss = np.inf
     w = initial_w
-    # prev_loss is the previous loss result, first set to a big number.
-    prev_loss = 99999
+
+    # start the logistic regression
     for iter in range(max_iters):
-        # get loss and update w.
-        loss, w = helpers.learning_by_newton_method(y, tx, w, gamma)
-
-        # convergeance check
-        if (prev_loss - loss) < convergeance_thresh:
-            print(f'Converged!')
-            break
-        else: 
-            prev_loss = loss
-
+        # get loss, grad and update w.
+        loss = helpers.calculate_nll(y, tx, w)
+        grad = helpers.calculate_grad_nll(y, tx, w)
+        w = w - gamma*grad
+        # converge criterion
+        if (prev_loss - loss) < threshold:
+            print(f'Converged with nnl loss {loss} at iteration {iter}.')
+            break 
+        prev_loss = loss
+    if (iter == max_iters - 1):
+        print(f'Warning: reached max iterations {max_iters}.')
     return w, loss
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
-    """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
-       meaning that the regression has "converged".
     """
-    convergeance_thresh = 1e-4
+    Regularized logistic regression using gradient descent or SGD
+    Args:
+        y:  shape=(N, 1)
+        tx: shape=(N, D)
+        initial_w: shape=(D, 1)
+        max_iters: int
+        gamma: float
+    """
+    # init parameters
+    threshold = 1e-4
+    prev_loss = np.inf
     w = initial_w
-    # prev_loss is the previous loss result, first set to a big number.
-    prev_loss = 99999
-    for iter in range(max_iters):
-        # get loss and update w.
-        loss, w = helpers.learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
 
-        # convergeance check
-        if (prev_loss - loss) < convergeance_thresh:
-            print(f'Converged!')
-            break
-        else: 
-            prev_loss = loss
+    # start the logistic regression
+    for iter in range(max_iters):
+        # get loss, grad and update w.
+        loss = helpers.calculate_nll(y, tx, w) + lambda_*np.linalg.norm(w, 2)**2
+        grad = helpers.calculate_grad_nll(y, tx, w) + 2*lambda_*w
+        w = w - gamma*grad
+        # converge criterion
+        if (prev_loss - loss) < threshold:
+            print(f'Converged with nnl loss {loss} at iteration {iter}.')
+            break 
+        prev_loss = loss
+    if (iter == max_iters - 1):
+        print(f'Warning: reached max iterations {max_iters}.')
     return w, loss

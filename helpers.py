@@ -221,7 +221,8 @@ def sigmoid(t):
     >>> sigmoid(np.array([0.1, 0.1]))
     array([0.52497919, 0.52497919])
     """
-    return np.exp(t) / (1 + np.exp(t))
+
+    return 1 / (1 + np.exp(-t))
 
 
 def calculate_nll(y, tx, w):
@@ -238,23 +239,16 @@ def calculate_nll(y, tx, w):
     >>> y = np.c_[[0., 1.]]
     >>> tx = np.arange(4).reshape(2, 2)
     >>> w = np.c_[[2., 3.]]
-    >>> round(calculate_nll(y, tx, w), 8)
+    >>> round(calculate_loss(y, tx, w), 8)
     1.52429481
     """
     assert y.shape[0] == tx.shape[0]
     assert tx.shape[1] == w.shape[0]
 
-    sum = 0
-    for i in range(y.shape[0]):
-        sig_val = 1 + np.exp(-y[i]*tx[i].dot(w))
-        if sig_val == 0:
-            return np.inf
-        sum += np.log(sig_val)
-    return sum / y.shape[0]
+    return -1/len(y)*np.sum(y*np.log(sigmoid(tx@w)) + (1 - y)*np.log(1 - sigmoid(tx@w)))
 
-
-def calculate_nll_gradient(y, tx, w):
-    """compute the gradient of loss.
+def calculate_grad_nll(y, tx, w):
+    """compute the gradient of negative log-likelihood loss.
 
     Args:
         y:  shape=(N, 1)
@@ -268,139 +262,13 @@ def calculate_nll_gradient(y, tx, w):
     >>> y = np.c_[[0., 1.]]
     >>> tx = np.arange(6).reshape(2, 3)
     >>> w = np.array([[0.1], [0.2], [0.3]])
-    >>> calculate_nll_gradient(y, tx, w)
+    >>> calculate_gradient(y, tx, w)
     array([[-0.10370763],
            [ 0.2067104 ],
            [ 0.51712843]])
     """
-    return tx.transpose().dot(sigmoid(tx.dot(w)) - y) / y.shape[0]
 
-
-def calculate_hessian(y, tx, w):
-    """return the Hessian of the loss function.
-
-    Args:
-        y:  shape=(N, 1)
-        tx: shape=(N, D)
-        w:  shape=(D, 1)
-
-    Returns:
-        a hessian matrix of shape=(D, D)
-
-    >>> y = np.c_[[0., 1.]]
-    >>> tx = np.arange(6).reshape(2, 3)
-    >>> w = np.array([[0.1], [0.2], [0.3]])
-    >>> calculate_hessian(y, tx, w)
-    array([[0.28961235, 0.3861498 , 0.48268724],
-           [0.3861498 , 0.62182124, 0.85749269],
-           [0.48268724, 0.85749269, 1.23229813]])
-    """
-    tx_transpose_dot_s = np.zeros((tx.shape[1], tx.shape[0]))
-    for i in range(y.shape[0]):
-        sig = sigmoid(tx[i].dot(w))
-        s_val = sig * (1 - sig)
-        for j in range(tx.shape[1]):
-            tx_transpose_dot_s[j][i] = tx[i][j] * s_val
-    return tx_transpose_dot_s.dot(tx) / y.shape[0]
-
-
-def learning_by_newton_method(y, tx, w, gamma):
-    """
-    Do one step of Newton's method.
-    Return the loss and updated w.
-
-    Args:
-        y:  shape=(N, 1)
-        tx: shape=(N, D)
-        w:  shape=(D, 1)
-        gamma: scalar
-
-    Returns:
-        loss: scalar number
-        w: shape=(D, 1)
-
-    >>> y = np.c_[[0., 0., 1., 1.]]
-    >>> np.random.seed(0)
-    >>> tx = np.random.rand(4, 3)
-    >>> w = np.array([[0.1], [0.5], [0.5]])
-    >>> gamma = 0.1
-    >>> loss, w = learning_by_newton_method(y, tx, w, gamma)
-    >>> round(loss, 8)
-    0.71692036
-    >>> w
-    array([[-1.31876014],
-           [ 1.0590277 ],
-           [ 0.80091466]])
-    """
-    loss, gradient, hessian = calculate_nll(y, tx, w), calculate_nll_gradient(y, tx, w), calculate_hessian(y, tx, w)
-
-    w_diff = np.linalg.solve(hessian, gamma * gradient)
-
-    return loss, w - w_diff
-
-
-def penalized_logistic_regression(y, tx, w, lambda_):
-    """return the loss and gradient.
-
-    Args:
-        y:  shape=(N, 1)
-        tx: shape=(N, D)
-        w:  shape=(D, 1)
-        lambda_: scalar
-
-    Returns:
-        loss: scalar number
-        gradient: shape=(D, 1)
-
-    >>> y = np.c_[[0., 1.]]
-    >>> tx = np.arange(6).reshape(2, 3)
-    >>> w = np.array([[0.1], [0.2], [0.3]])
-    >>> lambda_ = 0.1
-    >>> loss, gradient = penalized_logistic_regression(y, tx, w, lambda_)
-    >>> round(loss, 8)
-    0.63537268
-    >>> gradient
-    array([[-0.08370763],
-           [ 0.2467104 ],
-           [ 0.57712843]])
-    """
-    return calculate_nll(y, tx, w) + lambda_ * np.linalg.norm(w) ** 2, calculate_nll_gradient(y, tx, w) + 2 * lambda_ * w
-
-
-def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
-    """
-    Do one step of gradient descent, using the penalized logistic regression.
-    Return the loss and updated w.
-
-    Args:
-        y:  shape=(N, 1)
-        tx: shape=(N, D)
-        w:  shape=(D, 1)
-        gamma: scalar
-        lambda_: scalar
-
-    Returns:
-        loss: scalar number
-        w: shape=(D, 1)
-
-    >>> np.set_printoptions(8)
-    >>> y = np.c_[[0., 1.]]
-    >>> tx = np.arange(6).reshape(2, 3)
-    >>> w = np.array([[0.1], [0.2], [0.3]])
-    >>> lambda_ = 0.1
-    >>> gamma = 0.1
-    >>> loss, w = learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
-    >>> round(loss, 8)
-    0.63537268
-    >>> w
-    array([[0.10837076],
-           [0.17532896],
-           [0.24228716]])
-    """
-    loss, gradient = penalized_logistic_regression(y, tx, w, lambda_)
-    w = w - gamma * gradient
-    return loss, w
-
+    return 1/len(y)*tx.T@(sigmoid(tx@w) - y)
 
 def first_filter(x_train, x_train_head, x_test, filter):
     indexes_to_delete = []
@@ -432,7 +300,6 @@ def make_predictions_logistic_regression(weights, x_test):
     y_pred[y_pred > 0.5] = 1
     
     return y_pred
-
 
 def create_csv_submission(ids, y_pred, name):
     """
@@ -543,6 +410,10 @@ def process_features(x_train, x_test, onehot_thresh=100):
             x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
             x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
             print(f'Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing')
+
+    # Add bias term
+    x_train_processed = np.hstack((np.ones((x_train_processed.shape[0], 1)), x_train_processed))
+    x_test_processed = np.hstack((np.ones((x_test_processed.shape[0], 1)), x_test_processed))
 
     return x_train_processed, x_test_processed
 
