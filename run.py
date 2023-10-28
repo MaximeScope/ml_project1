@@ -32,8 +32,8 @@ x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 33)
 # Weights from least squares
 # weights, _ = implementations.least_squares(y_train, x_train_f2)
 
-init_weights, init_rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, -3, 2), 1)
-print("best w: " + str(init_weights) + " with rmse " + str(init_rmse))
+# init_weights, init_rmse = helpers.train_ridge_regression(y_train, x_train_f2, 2, np.logspace(-4, -3, 2), 1)
+# print("best w: " + str(init_weights) + " with rmse " + str(init_rmse))
 
 # Weights from ridge regression
 # weights, rmse = helpers.train_model(y_train, x_train_f2, 2, 1, implementations.logistic_regression,
@@ -41,13 +41,12 @@ print("best w: " + str(init_weights) + " with rmse " + str(init_rmse))
 # print("best w: " + str(weights) + " with rmse " + str(rmse))
 weights, _ = implementations.reg_logistic_regression(y_train_p, 
                                         x_train_p,
-                                        initial_w=np.zeros(x_train_p.shape[1]) + 1e-1, 
-                                        gamma=1e-2,
                                         lambda_=1e-3,
+                                        initial_w=np.zeros(x_train_p.shape[1]) + 1e-1,
                                         max_iters=100,
-                                        convergeance_thresh=1e-3)
+                                        gamma=1e-2)
 
-# 4. Make predictions:
+### 7. Make predictions:
 y_pred = helpers.make_predictions_logistic_regression(weights, x_test_p)
 
 # Store the predictions in a submission_file.csv in CSV format without index_label

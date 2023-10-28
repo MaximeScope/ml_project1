@@ -78,9 +78,10 @@ def least_squares(y, tx):
     >>> least_squares(np.array([0.1,0.2]), np.array([[2.3, 3.2], [1., 0.1]]))
     (array([ 0.21212121, -0.12121212]), 8.666684749742561e-33)
     """
-
+    # Using a linear algroithm solver following the formula for ridge regression
     w = np.linalg.solve(np.transpose(tx).dot(tx), np.transpose(tx).dot(y))
-    return w, helpers.compute_mse(y, tx, w)
+    loss = helpers.compute_mse(y, tx, w)
+    return w, loss
 
 
 def ridge_regression(y, tx, lambda_):
@@ -99,12 +100,20 @@ def ridge_regression(y, tx, lambda_):
     >>> ridge_regression(np.array([0.1,0.2]), np.array([[2.3, 3.2], [1., 0.1]]), 1)
     array([0.03947092, 0.00319628])
     """
-    return np.linalg.solve(np.transpose(tx).dot(tx) + 2 * y.shape[0] * lambda_ * np.identity(tx.shape[1]),
+    # Using a linear algroithm solver following the formula for ridge regression
+    w = np.linalg.solve(np.transpose(tx).dot(tx) + 2 * y.shape[0] * lambda_ * np.identity(tx.shape[1]),
                            np.transpose(tx).dot(y))
+    loss = helpers.compute_mse(y, tx, w)
+    return w, loss
 
 
-def logistic_regression(y, tx, initial_w, gamma, max_iters=100, convergeance_thresh=1e-3):
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
+       meaning that the regression has "converged".
+    """
+    convergeance_thresh = 1e-3
     w = initial_w
+    # prev_loss is the previous loss result, first set to a big number.
     prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
@@ -121,8 +130,13 @@ def logistic_regression(y, tx, initial_w, gamma, max_iters=100, convergeance_thr
     return w, loss
 
 
-def reg_logistic_regression(y, tx, initial_w, gamma, lambda_, max_iters=100, convergeance_thresh=1e-3):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
+       meaning that the regression has "converged".
+    """
+    convergeance_thresh = 1e-3
     w = initial_w
+    # prev_loss is the previous loss result, first set to a big number.
     prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
