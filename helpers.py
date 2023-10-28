@@ -190,30 +190,28 @@ def compute_mse(y, tx, w):
     """Calculate the loss using either MSE or MAE.
 
     Args:
-        y: numpy array of shape=(N, )
-        tx: numpy array of shape=(N,2)
-        w: numpy array of shape=(2,). The vector of model parameters.
+        y: shape=(N, )
+        tx: shape=(N,2)
+        w: shape=(2,). The vector of model parameters.
 
     Returns:
         the value of the loss (a scalar), corresponding to the input parameters w.
     """
-    print(tx.shape)
-    print(w.shape)
-    return np.mean((y - tx.dot(w)) ** 2) / 2
+    return 1 / (2 * len(y)) * np.sum((y - tx @ w) ** 2)
 
 
-def compute_gradient(y, tx, w):
+def compute_grad(y, tx, w):
     """Computes the gradient at w.
 
     Args:
-        y: numpy array of shape=(N, )
-        tx: numpy array of shape=(N,2)
-        w: numpy array of shape=(2, ). The vector of model parameters.
+        y: shape=(N, )
+        tx: shape=(N,2)
+        w: shape=(2, ). The vector of model parameters.
 
     Returns:
-        An numpy array of shape (2, ) (same shape as w), containing the gradient of the loss at w.
+        An array of shape (2, ) (same shape as w), containing the gradient of the loss at w.
     """
-    return -np.transpose(tx).dot(y - tx.dot(w)) / np.shape(y)[0]
+    return -1 / len(y) * tx.T @ (y - tx @ w)
 
 
 def sigmoid(t):
