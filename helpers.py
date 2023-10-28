@@ -4,6 +4,7 @@ import numpy as np
 import os
 import implementations
 
+
 def load_csv_data(data_path, sub_sample=False):
     """
     This function loads the data and returns the respectinve numpy arrays.
@@ -21,14 +22,10 @@ def load_csv_data(data_path, sub_sample=False):
         test_ids (np.array): ids of test data
     """
     x_train_head = np.genfromtxt(
-        os.path.join(data_path, "x_train.csv"), 
-        delimiter=",", 
-        max_rows=1,
-        dtype=str
+        os.path.join(data_path, "x_train.csv"), delimiter=",", max_rows=1, dtype=str
     )
     x_test = np.genfromtxt(
-        os.path.join(data_path, "x_test.csv"), delimiter=",",
-        skip_header=1
+        os.path.join(data_path, "x_test.csv"), delimiter=",", skip_header=1
     )
     if sub_sample:
         y_train = np.genfromtxt(
@@ -37,13 +34,13 @@ def load_csv_data(data_path, sub_sample=False):
             skip_header=1,
             dtype=int,
             usecols=1,
-            max_rows=10000
+            max_rows=10000,
         )
         x_train = np.genfromtxt(
-            os.path.join(data_path, "x_train.csv"), 
+            os.path.join(data_path, "x_train.csv"),
             delimiter=",",
             skip_header=1,
-            max_rows=10000
+            max_rows=10000,
         )
     else:
         y_train = np.genfromtxt(
@@ -54,7 +51,7 @@ def load_csv_data(data_path, sub_sample=False):
             usecols=1,
         )
         x_train = np.genfromtxt(
-            os.path.join(data_path, "x_train.csv"), 
+            os.path.join(data_path, "x_train.csv"),
             delimiter=",",
             skip_header=1,
         )
@@ -62,7 +59,7 @@ def load_csv_data(data_path, sub_sample=False):
     test_ids = x_test[:, 0].astype(dtype=int)
     x_train = x_train[:, 1:]
     x_test = x_test[:, 1:]
-        
+
     return x_train, x_train_head, x_test, y_train, train_ids, test_ids
 
 
@@ -118,7 +115,9 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
     return loss_te, w
 
 
-def cross_validation(y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None):
+def cross_validation(
+    y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None
+):
     test_x = np.array([x[i] for i in k_indices[k]])
     test_y = np.array([y[i] for i in k_indices[k]])
     train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
@@ -149,28 +148,37 @@ def train_ridge_regression(y, x, k_fold, lambdas, seed):
 
         curr_rmse = loss_te_sum / k_fold
         if curr_rmse < best_rmse:
-            print("Got best w with lambda " + str(lambda_) + " with rmse " + str(curr_rmse))
+            print(
+                "Got best w with lambda "
+                + str(lambda_)
+                + " with rmse "
+                + str(curr_rmse)
+            )
             best_rmse = curr_rmse
             best_w = w_sum / k_fold
 
     return best_w, best_rmse
 
 
-def train_model(y, x, k_fold, seed, function, loss_fn, params, initial_w=None, max_iters=None):
+def train_model(
+    y, x, k_fold, seed, function, loss_fn, params, initial_w=None, max_iters=None
+):
     k_indices = build_k_indices(y, k_fold, seed)
 
     best_loss = 99999
     best_w = np.zeros(x.shape[1])
-    print(f'Checking params {params}')
+    print(f"Checking params {params}")
     for param in params:
         loss_te_sum = 0
         w_sum = np.zeros(x.shape[1])
         for k in range(k_fold):
-            loss_te, w = cross_validation(y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters)
+            loss_te, w = cross_validation(
+                y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters
+            )
             loss_te_sum += loss_te
             w_sum += w
         curr_loss = loss_te_sum / k_fold
-        print(f'Got loss {curr_loss} for param {param}')
+        print(f"Got loss {curr_loss} for param {param}")
         if curr_loss < best_loss:
             best_rmse = curr_loss
             best_w = w_sum / k_fold
@@ -192,6 +200,7 @@ def compute_mse(y, tx, w):
     print(tx.shape)
     print(w.shape)
     return np.mean((y - tx.dot(w)) ** 2) / 2
+
 
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
@@ -245,7 +254,12 @@ def calculate_nll(y, tx, w):
     assert y.shape[0] == tx.shape[0]
     assert tx.shape[1] == w.shape[0]
 
-    return -1/len(y)*np.sum(y*np.log(sigmoid(tx@w)) + (1 - y)*np.log(1 - sigmoid(tx@w)))
+    return (
+        -1
+        / len(y)
+        * np.sum(y * np.log(sigmoid(tx @ w)) + (1 - y) * np.log(1 - sigmoid(tx @ w)))
+    )
+
 
 def calculate_grad_nll(y, tx, w):
     """compute the gradient of negative log-likelihood loss.
@@ -268,7 +282,8 @@ def calculate_grad_nll(y, tx, w):
            [ 0.51712843]])
     """
 
-    return 1/len(y)*tx.T@(sigmoid(tx@w) - y)
+    return 1 / len(y) * tx.T @ (sigmoid(tx @ w) - y)
+
 
 def first_filter(x_train, x_train_head, x_test, filter):
     indexes_to_delete = []
@@ -279,27 +294,29 @@ def first_filter(x_train, x_train_head, x_test, filter):
 
     x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
     x_test_f1 = np.delete(x_test, indexes_to_delete, axis=1)
-    
+
     return x_train_f1, x_test_f1
 
 
 def make_predictions_linear_regression(weights, x_test):
     y_pred = x_test.dot(weights)
 
-    # Transform the predictions with values from -1 to 1
+    # Transform the predictions with values from -1 to 1
     y_pred_norm = 2 * (y_pred - y_pred.min()) / (y_pred.max() - y_pred.min()) - 1
 
     y_pred_norm[y_pred_norm > 0] = 1
     y_pred_norm[y_pred_norm <= 0] = -1
-    
+
     return y_pred_norm
+
 
 def make_predictions_logistic_regression(weights, x_test):
     y_pred = sigmoid(x_test.dot(weights))
     y_pred[y_pred <= 0.5] = -1
     y_pred[y_pred > 0.5] = 1
-    
+
     return y_pred
+
 
 def create_csv_submission(ids, y_pred, name):
     """
@@ -323,6 +340,7 @@ def create_csv_submission(ids, y_pred, name):
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({"Id": int(r1), "Prediction": int(r2)})
 
+
 def replace_nan_with_median(x_train, x_test):
     """
     Replace NaN values with the median of the column
@@ -342,6 +360,7 @@ def replace_nan_with_median(x_train, x_test):
         x_test[nan_indices_test, col] = col_median_train
     return x_train, x_test
 
+
 def second_filter(x_train, x_test, tol=1e-3):
     """
     Filter the features that are proportional to each other
@@ -355,7 +374,7 @@ def second_filter(x_train, x_test, tol=1e-3):
     """
     cols_filtered = [0]
     for col1 in range(1, x_train.shape[1]):
-        is_prop = False  
+        is_prop = False
         for col2 in cols_filtered:
             if np.allclose(x_train[:, col1], x_train[:, col2], rtol=tol):
                 is_prop = True
@@ -364,10 +383,12 @@ def second_filter(x_train, x_test, tol=1e-3):
             cols_filtered.append(col1)
     return x_train[:, cols_filtered], x_test[:, cols_filtered]
 
+
 def process_labels(y):
     y[y == -1] = 0
-    y[y == 1] = 1 
-    return y    
+    y[y == 1] = 1
+    return y
+
 
 def onehot_encode_col(x_trainj, x_testj):
     unique = np.unique(x_trainj)
@@ -382,13 +403,15 @@ def onehot_encode_col(x_trainj, x_testj):
 
     return x_trainj_onehot, x_testj_onehot
 
+
 def standardize_col(x_trainj, x_testj):
     mean = np.mean(x_trainj)
     std = np.std(x_trainj)
-    x_trainj = (x_trainj - mean)/std + .5
-    x_testj = (x_testj - mean)/std + .5
+    x_trainj = (x_trainj - mean) / std + 0.5
+    x_testj = (x_testj - mean) / std + 0.5
 
     return x_trainj.reshape(len(x_trainj), -1), x_testj.reshape(len(x_testj), -1)
+
 
 def process_features(x_train, x_test, onehot_thresh=100):
     x_train_processed = np.zeros((x_train.shape[0], 0))
@@ -398,29 +421,43 @@ def process_features(x_train, x_test, onehot_thresh=100):
         num_uniquej = len(np.unique(x_train[:, j]))
 
         # onehot encode if number of unique values is less than onehot_thresh
-        if (num_uniquej <= onehot_thresh):
-            x_trainj_onehot, x_testj_onehot = onehot_encode_col(x_train[:, j], x_test[:, j])
+        if num_uniquej <= onehot_thresh:
+            x_trainj_onehot, x_testj_onehot = onehot_encode_col(
+                x_train[:, j], x_test[:, j]
+            )
             x_train_processed = np.hstack((x_train_processed, x_trainj_onehot))
             x_test_processed = np.hstack((x_test_processed, x_testj_onehot))
-            print(f'Feature index {j} has {num_uniquej} unique values --> onehot encoding')
+            print(
+                f"Feature index {j} has {num_uniquej} unique values --> onehot encoding"
+            )
 
-        else:  
-        # standardize if number of unique values is greater than onehot_thresh
-            x_trainj_standardized, x_testj_standardized = standardize_col(x_train[:, j], x_test[:, j])
+        else:
+            # standardize if number of unique values is greater than onehot_thresh
+            x_trainj_standardized, x_testj_standardized = standardize_col(
+                x_train[:, j], x_test[:, j]
+            )
             x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
             x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
-            print(f'Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing')
+            print(
+                f"Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing"
+            )
 
     # Add bias term
-    x_train_processed = np.hstack((np.ones((x_train_processed.shape[0], 1)), x_train_processed))
-    x_test_processed = np.hstack((np.ones((x_test_processed.shape[0], 1)), x_test_processed))
+    x_train_processed = np.hstack(
+        (np.ones((x_train_processed.shape[0], 1)), x_train_processed)
+    )
+    x_test_processed = np.hstack(
+        (np.ones((x_test_processed.shape[0], 1)), x_test_processed)
+    )
 
     return x_train_processed, x_test_processed
+
 
 def shuffle_data(x, y):
     """Shuffle the data"""
     shuffle_indices = np.random.permutation(np.arange(len(y)))
     return x[shuffle_indices], y[shuffle_indices]
+
 
 def balance_data(x_train, y_train):
     """
@@ -433,7 +470,7 @@ def balance_data(x_train, y_train):
         y_train_b: balanced output data
     """
     # Count number of y_train entries = 1
-    tot_ytrain1 = len(y_train[y_train == 1]) 
+    tot_ytrain1 = len(y_train[y_train == 1])
 
     # Create data subset such that there are equal number of y_train entries = 0 and y_train entries = 1
     x_train_b = []
@@ -441,12 +478,12 @@ def balance_data(x_train, y_train):
     cnt_ytrain1 = 0
     cnt_ytrain0 = 0
     for i in range(len(y_train)):
-        if (y_train[i] == 1):
+        if y_train[i] == 1:
             x_train_b.append(x_train[i])
             y_train_b.append(y_train[i])
             cnt_ytrain1 += 1
-        elif (y_train[i] == 0):
-            if (cnt_ytrain0 < tot_ytrain1):
+        elif y_train[i] == 0:
+            if cnt_ytrain0 < tot_ytrain1:
                 x_train_b.append(x_train[i])
                 y_train_b.append(y_train[i])
                 cnt_ytrain0 += 1
@@ -456,4 +493,4 @@ def balance_data(x_train, y_train):
     # Shuffle the data
     x_train_b, y_train_b = shuffle_data(x_train_b, y_train_b)
 
-    return x_train_b, y_train_b 
+    return x_train_b, y_train_b

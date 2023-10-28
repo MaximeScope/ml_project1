@@ -6,17 +6,17 @@ import random
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """The Gradient Descent (GD) algorithm.
 
-        Args:
-            y: numpy array of shape=(N, )
-            tx: numpy array of shape=(N,2)
-            initial_w: numpy array of shape=(2, ). The initial guess (or the initialization) for the model parameters
-            max_iters: a scalar denoting the total number of iterations of GD
-            gamma: a scalar denoting the stepsize
+    Args:
+        y: numpy array of shape=(N, )
+        tx: numpy array of shape=(N,2)
+        initial_w: numpy array of shape=(2, ). The initial guess (or the initialization) for the model parameters
+        max_iters: a scalar denoting the total number of iterations of GD
+        gamma: a scalar denoting the stepsize
 
-        Returns:
-            losses: a list of length max_iters containing the loss value (scalar) for each iteration of GD
-            ws: a list of length max_iters containing the model parameters as numpy arrays of shape (2, ), for each iteration of GD
-        """
+    Returns:
+        losses: a list of length max_iters containing the loss value (scalar) for each iteration of GD
+        ws: a list of length max_iters containing the model parameters as numpy arrays of shape (2, ), for each iteration of GD
+    """
     w = initial_w
     loss = 0
     for n_iter in range(max_iters):
@@ -101,8 +101,10 @@ def ridge_regression(y, tx, lambda_):
     array([0.03947092, 0.00319628])
     """
     # Using a linear algroithm solver following the formula for ridge regression
-    w = np.linalg.solve(np.transpose(tx).dot(tx) + 2 * y.shape[0] * lambda_ * np.identity(tx.shape[1]),
-                           np.transpose(tx).dot(y))
+    w = np.linalg.solve(
+        np.transpose(tx).dot(tx) + 2 * y.shape[0] * lambda_ * np.identity(tx.shape[1]),
+        np.transpose(tx).dot(y),
+    )
     loss = helpers.compute_mse(y, tx, w)
     return w, loss
 
@@ -127,14 +129,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         # get loss, grad and update w.
         loss = helpers.calculate_nll(y, tx, w)
         grad = helpers.calculate_grad_nll(y, tx, w)
-        w = w - gamma*grad
+        w = w - gamma * grad
         # converge criterion
         if (prev_loss - loss) < threshold:
-            print(f'Converged with nnl loss {loss} at iteration {iter}.')
-            break 
+            print(f"Converged with nnl loss {loss} at iteration {iter}.")
+            break
         prev_loss = loss
-    if (iter == max_iters - 1):
-        print(f'Warning: reached max iterations {max_iters}.')
+    if iter == max_iters - 1:
+        print(f"Warning: reached max iterations {max_iters}.")
     return w, loss
 
 
@@ -156,14 +158,14 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # start the logistic regression
     for iter in range(max_iters):
         # get loss, grad and update w.
-        loss = helpers.calculate_nll(y, tx, w) + lambda_*np.linalg.norm(w, 2)**2
-        grad = helpers.calculate_grad_nll(y, tx, w) + 2*lambda_*w
-        w = w - gamma*grad
+        loss = helpers.calculate_nll(y, tx, w) + lambda_ * np.linalg.norm(w, 2) ** 2
+        grad = helpers.calculate_grad_nll(y, tx, w) + 2 * lambda_ * w
+        w = w - gamma * grad
         # converge criterion
         if (prev_loss - loss) < threshold:
-            print(f'Converged with nnl loss {loss} at iteration {iter}.')
-            break 
+            print(f"Converged with nnl loss {loss} at iteration {iter}.")
+            break
         prev_loss = loss
-    if (iter == max_iters - 1):
-        print(f'Warning: reached max iterations {max_iters}.')
+    if iter == max_iters - 1:
+        print(f"Warning: reached max iterations {max_iters}.")
     return w, loss
