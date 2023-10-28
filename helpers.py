@@ -118,7 +118,7 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
     return loss_te, w
 
 
-def cross_validation(y, x, k_indices, k, function, param, initial_w=None, max_iters=None):
+def cross_validation(y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None):
     test_x = np.array([x[i] for i in k_indices[k]])
     test_y = np.array([y[i] for i in k_indices[k]])
     train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
@@ -129,10 +129,7 @@ def cross_validation(y, x, k_indices, k, function, param, initial_w=None, max_it
     else:
         w, _ = function(train_y, train_x, initial_w, max_iters, param)
 
-    print(w)
-    print(test_y.shape)
-    print(test_x.shape)
-    loss_te = np.sqrt(np.mean((test_y - test_x.dot(w)) ** 2))
+    loss_te = loss_fn(test_y, test_x, w)
     return loss_te, w
 
 
@@ -159,22 +156,23 @@ def train_ridge_regression(y, x, k_fold, lambdas, seed):
     return best_w, best_rmse
 
 
-def train_model(y, x, k_fold, seed, function, params, initial_w=None, max_iters=None):
+def train_model(y, x, k_fold, seed, function, loss_fn, params, initial_w=None, max_iters=None):
     k_indices = build_k_indices(y, k_fold, seed)
 
-    best_rmse = 99999
+    best_loss = 99999
     best_w = np.zeros(x.shape[1])
+    print(f'Checking params {params}')
     for param in params:
         loss_te_sum = 0
         w_sum = np.zeros(x.shape[1])
         for k in range(k_fold):
-            loss_te, w = cross_validation(y, x, k_indices, k, function, param, initial_w, max_iters)
+            loss_te, w = cross_validation(y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters)
             loss_te_sum += loss_te
             w_sum += w
-
-        curr_rmse = loss_te_sum / k_fold
-        if curr_rmse < best_rmse:
-            best_rmse = curr_rmse
+        curr_loss = loss_te_sum / k_fold
+        print(f'Got loss {curr_loss} for param {param}')
+        if curr_loss < best_loss:
+            best_rmse = curr_loss
             best_w = w_sum / k_fold
 
     return best_w, best_rmse

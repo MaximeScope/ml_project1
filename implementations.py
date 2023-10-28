@@ -111,14 +111,13 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
        meaning that the regression has "converged".
     """
-    convergeance_thresh = 1e-3
+    convergeance_thresh = 1e-4
     w = initial_w
     # prev_loss is the previous loss result, first set to a big number.
     prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
         loss, w = helpers.learning_by_newton_method(y, tx, w, gamma)
-        print(f'Current iteration={iter}, loss={loss}')
 
         # convergeance check
         if (prev_loss - loss) < convergeance_thresh:
@@ -134,14 +133,13 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """convergeance_thresh breaks the loop when the change in losses lays under a certain threshold,
        meaning that the regression has "converged".
     """
-    convergeance_thresh = 1e-3
+    convergeance_thresh = 1e-4
     w = initial_w
     # prev_loss is the previous loss result, first set to a big number.
     prev_loss = 99999
     for iter in range(max_iters):
         # get loss and update w.
         loss, w = helpers.learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
-        print(f'Current iteration={iter}, loss={loss}')
 
         # convergeance check
         if (prev_loss - loss) < convergeance_thresh:
