@@ -118,7 +118,7 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
 
 def calculate_fscore(y, x, w, pred_func):
     pred_y = process_labels(pred_func(w, x))
-    f_vec = y + 2*pred_y
+    f_vec = y + 2 * pred_y
     tp = np.count_nonzero(f_vec == 3)
     fp = np.count_nonzero(f_vec == 2)
     fn = np.count_nonzero(f_vec == 1)
