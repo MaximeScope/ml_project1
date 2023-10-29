@@ -202,7 +202,7 @@ x_train, x_train_head, x_test, y_train, train_ids, test_ids = helpers.load_csv_d
 y_train_p = helpers.process_labels(y_train)
 
 ## 3. Balance the data
-x_train, y_train_p = helpers.balance_data(x_train, y_train)
+x_train, y_train_p = helpers.balance_data(x_train, y_train_p)
 print(f"dataset balanced with {x_train.shape[0]} samples")
 
 ## 4. Filter the features:
@@ -218,8 +218,8 @@ x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1, 1)
 print(f"applied second filter, remaining features: {x_train_f2.shape[1]}")
 
 ## 5. Encode the categorical features and standardize the data
-# x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 33)
-# print(f'features processed, remaining features: {x_train_p.shape[1]}')
+x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 33)
+print(f'features processed, remaining features: {x_train_p.shape[1]}')
 
 ## 6. Train the model:
 # Weights from least squares
@@ -231,16 +231,16 @@ print(f"applied second filter, remaining features: {x_train_f2.shape[1]}")
 # print(f'using best w from ridge_regression with rmse {str(rmse)} as initial weights')
 
 # Final weights from logistic regression
-x_train_p = x_train_f2
-x_test_p = x_test_f2
-weights, loss = helpers.train_model(
+#x_train_p = x_train_f2
+#x_test_p = x_test_f2
+weights, f_score = helpers.train_model(
     y_train_p,
     x_train_p,
-    2,
+    4,
     1,
     implementations.logistic_regression,
     helpers.calculate_nll,
-    np.logspace(-4, 0, 5),
+    np.logspace(0.440625, 0.44375, 5),
     initial_w=np.zeros(x_train_p.shape[1]),
     # initial_w=(np.random.random(x_train_p.shape[1]) - 0.5)*10,
     max_iters=100,
@@ -251,7 +251,7 @@ weights, loss = helpers.train_model(
 #                                         initial_w=weights,
 #                                         max_iters=100,
 #                                         gamma=1e-10)
-print(f"final weights from logistic regression obtained with loss {loss}")
+print(f"final weights from logistic regression obtained with F score {f_score}")
 
 ### 7. Make predictions:
 y_pred = helpers.make_predictions_logistic_regression(weights, x_test_p)

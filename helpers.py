@@ -115,6 +115,15 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
     return loss_te, w
 
 
+def calculate_fscore(y, x, w):
+    pred_y = make_predictions_logistic_regression(w, x)
+    f_vec = y + 2*pred_y
+    tp = np.count_nonzero(f_vec == 3)
+    fp = np.count_nonzero(f_vec == 2)
+    fn = np.count_nonzero(f_vec == 1)
+    return tp / (tp + (fp + fn) / 2)
+
+
 def cross_validation(
     y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None
 ):
@@ -128,8 +137,8 @@ def cross_validation(
     else:
         w, _ = function(train_y, train_x, initial_w, max_iters, param)
 
-    loss_te = loss_fn(test_y, test_x, w)
-    return loss_te, w
+    f_score = calculate_fscore(test_y, test_x, w)
+    return f_score, w
 
 
 def train_ridge_regression(y, x, k_fold, lambdas, seed):
@@ -165,25 +174,25 @@ def train_model(
 ):
     k_indices = build_k_indices(y, k_fold, seed)
 
-    best_loss = 99999
+    best_fscore = 0
     best_w = np.zeros(x.shape[1])
     print(f"Checking params {params}")
     for param in params:
-        loss_te_sum = 0
+        fscore_sum = 0
         w_sum = np.zeros(x.shape[1])
         for k in range(k_fold):
-            loss_te, w = cross_validation(
+            f_score, w = cross_validation(
                 y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters
             )
-            loss_te_sum += loss_te
+            fscore_sum += f_score
             w_sum += w
-        curr_loss = loss_te_sum / k_fold
-        print(f"Got loss {curr_loss} for param {param}")
-        if curr_loss < best_loss:
-            best_rmse = curr_loss
+        curr_fscore = fscore_sum / k_fold
+        print(f"Got F score {curr_fscore} for param {param}")
+        if curr_fscore > best_fscore:
+            best_fscore = curr_fscore
             best_w = w_sum / k_fold
 
-    return best_w, best_rmse
+    return best_w, best_fscore
 
 
 def compute_mse(y, tx, w):
