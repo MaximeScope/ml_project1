@@ -2,7 +2,6 @@
 import csv
 import numpy as np
 import os
-import implementations
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -58,9 +57,180 @@ def load_csv_data(data_path, sub_sample=False):
     train_ids = x_train[:, 0].astype(dtype=int)
     test_ids = x_test[:, 0].astype(dtype=int)
     x_train = x_train[:, 1:]
+    x_train_head = x_train_head[1:]
     x_test = x_test[:, 1:]
 
     return x_train, x_train_head, x_test, y_train, train_ids, test_ids
+
+
+def process_labels(y):
+    y[y == -1] = 0
+    y[y == 1] = 1
+    return y
+
+
+def first_filter(x_train, x_train_head, x_test, filter):
+    indexes_to_delete = []
+
+    for col_index in range(len(list(x_train_head))):
+        if list(x_train_head)[col_index] not in filter:
+            indexes_to_delete.append(col_index)
+
+    x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
+    x_test_f1 = np.delete(x_test, indexes_to_delete, axis=1)
+
+    return x_train_f1, x_test_f1
+
+
+def replace_nan_with_median(x_train, x_test):
+    """
+    Replace NaN values with the median of the column
+    Args:
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
+    Returns:
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
+    """
+
+    for col in range(x_train.shape[1]):
+        nan_indices_train = np.isnan(x_train[:, col])
+        nan_indices_test = np.isnan(x_test[:, col])
+        col_median_train = np.nanmedian(x_train[:, col])
+        x_train[nan_indices_train, col] = col_median_train
+        x_test[nan_indices_test, col] = col_median_train
+    return x_train, x_test
+
+
+def second_filter(x_train, x_test, tol=1e-3):
+    """
+    Filter the features that are proportional to each other
+    Args:
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
+        tol: tolerance for the allclose function
+    Returns:
+        x_train: numpy array of shape (N,D), D is the number of features.
+        x_test: numpy array of shape (N,D), D is the number of features.
+    """
+    cols_filtered = [0]
+    for col1 in range(1, x_train.shape[1]):
+        is_prop = False
+        for col2 in cols_filtered:
+            if np.allclose(x_train[:, col1], x_train[:, col2], rtol=tol):
+                is_prop = True
+                break
+        if not is_prop:
+            cols_filtered.append(col1)
+    return x_train[:, cols_filtered], x_test[:, cols_filtered]
+
+
+def process_features(x_train, x_test, onehot_thresh=100):
+    x_train_processed = np.zeros((x_train.shape[0], 0))
+    x_test_processed = np.zeros((x_test.shape[0], 0))
+
+    for j in range(x_train.shape[1]):
+        num_uniquej = len(np.unique(x_train[:, j]))
+
+        # onehot encode if number of unique values is less than onehot_thresh
+        if num_uniquej <= onehot_thresh:
+            x_trainj_onehot, x_testj_onehot = onehot_encode_col(
+                x_train[:, j], x_test[:, j]
+            )
+            x_train_processed = np.hstack((x_train_processed, x_trainj_onehot))
+            x_test_processed = np.hstack((x_test_processed, x_testj_onehot))
+            print(
+                f"Feature index {j} has {num_uniquej} unique values --> onehot encoding"
+            )
+
+        else:
+            # standardize if number of unique values is greater than onehot_thresh
+            x_trainj_standardized, x_testj_standardized = standardize_col(
+                x_train[:, j], x_test[:, j]
+            )
+            x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
+            x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
+            print(
+                f"Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing"
+            )
+
+    # Add bias term
+    x_train_processed = np.hstack(
+        (np.ones((x_train_processed.shape[0], 1)), x_train_processed)
+    )
+    x_test_processed = np.hstack(
+        (np.ones((x_test_processed.shape[0], 1)), x_test_processed)
+    )
+
+    return x_train_processed, x_test_processed
+
+
+def onehot_encode_col(x_trainj, x_testj):
+    unique = np.unique(x_trainj)
+    x_trainj_onehot = np.zeros((len(x_trainj), len(unique)))
+    x_testj_onehot = np.zeros((len(x_testj), len(unique)))
+
+    for j in range(len(x_trainj)):
+        x_trainj_onehot[j, np.where(unique == x_trainj[j])] = 1
+
+    for j in range(len(x_testj)):
+        x_testj_onehot[j, np.where(unique == x_testj[j])] = 1
+
+    return x_trainj_onehot, x_testj_onehot
+
+
+def standardize_col(x_trainj, x_testj):
+    mean = np.mean(x_trainj)
+    std = np.std(x_trainj)
+    x_trainj = (x_trainj - mean) / std + 0.5
+    x_testj = (x_testj - mean) / std + 0.5
+
+    return x_trainj.reshape(len(x_trainj), -1), x_testj.reshape(len(x_testj), -1)
+
+
+def train_model(
+    y, x, k_fold, seed, function, pred_func, params, initial_w=None, max_iters=None
+):
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    best_fscore = 0
+    best_w = np.zeros(x.shape[1])
+    print(f"Checking params {params}")
+    for param in params:
+        fscore_sum = 0
+        w_sum = np.zeros(x.shape[1])
+        for k in range(k_fold):
+            f_score, w = cross_validation(
+                y, x, k_indices, k, function, pred_func, param, initial_w, max_iters
+            )
+            fscore_sum += f_score
+            w_sum += w
+        curr_fscore = fscore_sum / k_fold
+        print(f"Got F score {curr_fscore} for param {param}")
+        if curr_fscore > best_fscore:
+            best_fscore = curr_fscore
+            best_w = w_sum / k_fold
+
+    return best_w, best_fscore
+
+
+def cross_validation(
+    y, x, k_indices, k, function, pred_func, param, initial_w=None, max_iters=None
+):
+    test_x = np.array([x[i] for i in k_indices[k]])
+    test_y = np.array([y[i] for i in k_indices[k]])
+    train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
+    train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
+
+    train_x, train_y = balance_data(train_x, train_y)
+
+    if initial_w is None:
+        w, _ = function(train_y, train_x, param)
+    else:
+        w, _ = function(train_y, train_x, initial_w, max_iters, param)
+
+    f_score = calculate_fscore(test_y, test_x, w, pred_func)
+    return f_score, w
 
 
 def build_k_indices(y, k_fold, seed):
@@ -88,102 +258,58 @@ def build_k_indices(y, k_fold, seed):
     return np.array(k_indices)
 
 
-def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
-    """return the loss of ridge regression for a fold corresponding to k_indices
-
-    Args:
-        y:          shape=(N,)
-        x:          shape=(N,)
-        k_indices:  2D array returned by build_k_indices()
-        k:          scalar, the k-th fold (N.B.: not to confused with k_fold which is the fold nums)
-        lambda_:    scalar, cf. ridge_regression()
-
-    Returns:
-        train and test root mean square errors rmse = sqrt(2 mse)
-
-    >>> ridge_regression_cross_validation(np.array([1.,2.,3.,4.]), np.array([6.,7.,8.,9.]), np.array([[3,2], [0,1]]), 1, 2)
-    (0.019866645527597114, 0.33555914361295175)
+def balance_data(x_train, y_train):
     """
-    test_x = np.array([x[i] for i in k_indices[k]])
-    test_y = np.array([y[i] for i in k_indices[k]])
-    train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
-    train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
+    Balance the data such that there are equal number of y_train entries = 0 and y_train entries = 1
+    Args:
+        x_train: input data
+        y_train: output data (0 or 1)
+    Returns:
+        x_train_b: balanced input data
+        y_train_b: balanced output data
+    """
+    # x_train, y_train = shuffle_data(x_train, y_train)
+    # Count number of y_train entries = 1
+    tot_ytrain1 = len(y_train[y_train == 1])
 
-    w = implementations.ridge_regression(train_y, train_x, lambda_)
+    # Create data subset such that there are equal number of y_train entries = 0 and y_train entries = 1
+    x_train_b = []
+    y_train_b = []
+    cnt_ytrain1 = 0
+    cnt_ytrain0 = 0
+    for i in range(len(y_train)):
+        if y_train[i] == 1:
+            x_train_b.append(x_train[i])
+            y_train_b.append(y_train[i])
+            cnt_ytrain1 += 1
+        elif y_train[i] == 0:
+            if cnt_ytrain0 < tot_ytrain1:
+                x_train_b.append(x_train[i])
+                y_train_b.append(y_train[i])
+                cnt_ytrain0 += 1
 
-    loss_te = np.sqrt(np.mean((test_y - test_x.dot(w)) ** 2))
-    return loss_te, w
+    x_train_b = np.array(x_train_b)
+    y_train_b = np.array(y_train_b)
+    # Shuffle the data
+    x_train_b, y_train_b = shuffle_data(x_train_b, y_train_b)
 
-
-def cross_validation(
-    y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None
-):
-    test_x = np.array([x[i] for i in k_indices[k]])
-    test_y = np.array([y[i] for i in k_indices[k]])
-    train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
-    train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
-
-    if initial_w is None:
-        w, _ = function(train_y, train_x, param)
-    else:
-        w, _ = function(train_y, train_x, initial_w, max_iters, param)
-
-    loss_te = loss_fn(test_y, test_x, w)
-    return loss_te, w
-
-
-def train_ridge_regression(y, x, k_fold, lambdas, seed):
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    best_rmse = 99999
-    best_w = np.zeros(x.shape[1])
-    for lambda_ in lambdas:
-        print("Checking lambda " + str(lambda_))
-        loss_te_sum = 0
-        w_sum = np.zeros(x.shape[1])
-        for k in range(k_fold):
-            loss_te, w = ridge_regression_cross_validation(y, x, k_indices, k, lambda_)
-            loss_te_sum += loss_te
-            w_sum += w
-
-        curr_rmse = loss_te_sum / k_fold
-        if curr_rmse < best_rmse:
-            print(
-                "Got best w with lambda "
-                + str(lambda_)
-                + " with rmse "
-                + str(curr_rmse)
-            )
-            best_rmse = curr_rmse
-            best_w = w_sum / k_fold
-
-    return best_w, best_rmse
+    return x_train_b, y_train_b
 
 
-def train_model(
-    y, x, k_fold, seed, function, loss_fn, params, initial_w=None, max_iters=None
-):
-    k_indices = build_k_indices(y, k_fold, seed)
+def shuffle_data(x, y):
+    """Shuffle the data"""
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    return x[shuffle_indices], y[shuffle_indices]
 
-    best_loss = 99999
-    best_w = np.zeros(x.shape[1])
-    print(f"Checking params {params}")
-    for param in params:
-        loss_te_sum = 0
-        w_sum = np.zeros(x.shape[1])
-        for k in range(k_fold):
-            loss_te, w = cross_validation(
-                y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters
-            )
-            loss_te_sum += loss_te
-            w_sum += w
-        curr_loss = loss_te_sum / k_fold
-        print(f"Got loss {curr_loss} for param {param}")
-        if curr_loss < best_loss:
-            best_rmse = curr_loss
-            best_w = w_sum / k_fold
 
-    return best_w, best_rmse
+def calculate_fscore(y, x, w, pred_func):
+    pred_y = process_labels(pred_func(w, x))
+    f_vec = y + 2 * pred_y
+    tp = np.count_nonzero(f_vec == 3)
+    fp = np.count_nonzero(f_vec == 2)
+    fn = np.count_nonzero(f_vec == 1)
+    print(f_vec)
+    return tp / (tp + (fp + fn) / 2)
 
 
 def compute_mse(y, tx, w):
@@ -283,19 +409,6 @@ def calculate_grad_nll(y, tx, w):
     return 1 / len(y) * tx.T @ (sigmoid(tx @ w) - y)
 
 
-def first_filter(x_train, x_train_head, x_test, filter):
-    indexes_to_delete = []
-
-    for col_index in range(len(list(x_train_head))):
-        if list(x_train_head)[col_index] not in filter:
-            indexes_to_delete.append(col_index)
-
-    x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
-    x_test_f1 = np.delete(x_test, indexes_to_delete, axis=1)
-
-    return x_train_f1, x_test_f1
-
-
 def make_predictions_linear_regression(weights, x_test):
     y_pred = x_test.dot(weights)
 
@@ -337,158 +450,3 @@ def create_csv_submission(ids, y_pred, name):
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({"Id": int(r1), "Prediction": int(r2)})
-
-
-def replace_nan_with_median(x_train, x_test):
-    """
-    Replace NaN values with the median of the column
-    Args:
-        x_train: numpy array of shape (N,D), D is the number of features.
-        x_test: numpy array of shape (N,D), D is the number of features.
-    Returns:
-        x_train: numpy array of shape (N,D), D is the number of features.
-        x_test: numpy array of shape (N,D), D is the number of features.
-    """
-
-    for col in range(x_train.shape[1]):
-        nan_indices_train = np.isnan(x_train[:, col])
-        nan_indices_test = np.isnan(x_test[:, col])
-        col_median_train = np.nanmedian(x_train[:, col])
-        x_train[nan_indices_train, col] = col_median_train
-        x_test[nan_indices_test, col] = col_median_train
-    return x_train, x_test
-
-
-def second_filter(x_train, x_test, tol=1e-3):
-    """
-    Filter the features that are equal to each other within a tolerance
-    Args:
-        x_train: numpy array of shape (N,D), D is the number of features.
-        x_test: numpy array of shape (N,D), D is the number of features.
-        tol: tolerance for the allclose function
-    Returns:
-        x_train: numpy array of shape (N,D), D is the number of features.
-        x_test: numpy array of shape (N,D), D is the number of features.
-    """
-    cols_filtered = [0]
-    for col1 in range(1, x_train.shape[1]):
-        is_prop = False
-        for col2 in cols_filtered:
-            if np.allclose(x_train[:, col1], x_train[:, col2], rtol=tol):
-                is_prop = True
-                break
-        if not is_prop:
-            cols_filtered.append(col1)
-    return x_train[:, cols_filtered], x_test[:, cols_filtered]
-
-
-def process_labels(y):
-    y[y == -1] = 0
-    y[y == 1] = 1
-    return y
-
-
-def onehot_encode_col(x_trainj, x_testj):
-    unique = np.unique(x_trainj)
-    x_trainj_onehot = np.zeros((len(x_trainj), len(unique)))
-    x_testj_onehot = np.zeros((len(x_testj), len(unique)))
-
-    for j in range(len(x_trainj)):
-        x_trainj_onehot[j, np.where(unique == x_trainj[j])] = 1
-
-    for j in range(len(x_testj)):
-        x_testj_onehot[j, np.where(unique == x_testj[j])] = 1
-
-    return x_trainj_onehot, x_testj_onehot
-
-
-def standardize_col(x_trainj, x_testj):
-    mean = np.mean(x_trainj)
-    std = np.std(x_trainj)
-    x_trainj = (x_trainj - mean) / std + 0.5
-    x_testj = (x_testj - mean) / std + 0.5
-
-    return x_trainj.reshape(len(x_trainj), -1), x_testj.reshape(len(x_testj), -1)
-
-
-def process_features(x_train, x_test, onehot_thresh=100):
-    x_train_processed = np.zeros((x_train.shape[0], 0))
-    x_test_processed = np.zeros((x_test.shape[0], 0))
-
-    for j in range(x_train.shape[1]):
-        num_uniquej = len(np.unique(x_train[:, j]))
-
-        # onehot encode if number of unique values is less than onehot_thresh
-        if num_uniquej <= onehot_thresh:
-            x_trainj_onehot, x_testj_onehot = onehot_encode_col(
-                x_train[:, j], x_test[:, j]
-            )
-            x_train_processed = np.hstack((x_train_processed, x_trainj_onehot))
-            x_test_processed = np.hstack((x_test_processed, x_testj_onehot))
-            print(
-                f"Feature index {j} has {num_uniquej} unique values --> onehot encoding"
-            )
-
-        else:
-            # standardize if number of unique values is greater than onehot_thresh
-            x_trainj_standardized, x_testj_standardized = standardize_col(
-                x_train[:, j], x_test[:, j]
-            )
-            x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
-            x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
-            print(
-                f"Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing"
-            )
-
-    # Add bias term
-    x_train_processed = np.hstack(
-        (np.ones((x_train_processed.shape[0], 1)), x_train_processed)
-    )
-    x_test_processed = np.hstack(
-        (np.ones((x_test_processed.shape[0], 1)), x_test_processed)
-    )
-
-    return x_train_processed, x_test_processed
-
-
-def shuffle_data(x, y):
-    """Shuffle the data"""
-    shuffle_indices = np.random.permutation(np.arange(len(y)))
-    return x[shuffle_indices], y[shuffle_indices]
-
-
-def balance_data(x_train, y_train):
-    """
-    Balance the data such that there are equal number of y_train entries = 0 and y_train entries = 1
-    Args:
-        x_train: input data
-        y_train: output data (0 or 1)
-    Returns:
-        x_train_b: balanced input data
-        y_train_b: balanced output data
-    """
-    # Count number of y_train entries = 1
-    tot_ytrain1 = len(y_train[y_train == 1])
-
-    # Create data subset such that there are equal number of y_train entries = 0 and y_train entries = 1
-    x_train_b = []
-    y_train_b = []
-    cnt_ytrain1 = 0
-    cnt_ytrain0 = 0
-    for i in range(len(y_train)):
-        if y_train[i] == 1:
-            x_train_b.append(x_train[i])
-            y_train_b.append(y_train[i])
-            cnt_ytrain1 += 1
-        elif y_train[i] == 0:
-            if cnt_ytrain0 < tot_ytrain1:
-                x_train_b.append(x_train[i])
-                y_train_b.append(y_train[i])
-                cnt_ytrain0 += 1
-
-    x_train_b = np.array(x_train_b)
-    y_train_b = np.array(y_train_b)
-    # Shuffle the data
-    x_train_b, y_train_b = shuffle_data(x_train_b, y_train_b)
-
-    return x_train_b, y_train_b
