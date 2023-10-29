@@ -116,11 +116,12 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
 
 
 def calculate_fscore(y, x, w):
-    pred_y = make_predictions_logistic_regression(w, x)
+    pred_y = process_labels(make_predictions_logistic_regression(w, x))
     f_vec = y + 2*pred_y
     tp = np.count_nonzero(f_vec == 3)
     fp = np.count_nonzero(f_vec == 2)
     fn = np.count_nonzero(f_vec == 1)
+    print(f_vec)
     return tp / (tp + (fp + fn) / 2)
 
 

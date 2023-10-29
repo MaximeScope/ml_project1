@@ -218,7 +218,7 @@ x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1, 1)
 print(f"applied second filter, remaining features: {x_train_f2.shape[1]}")
 
 ## 5. Encode the categorical features and standardize the data
-x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 33)
+x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 10)
 print(f'features processed, remaining features: {x_train_p.shape[1]}')
 
 ## 6. Train the model:
@@ -240,7 +240,7 @@ weights, f_score = helpers.train_model(
     1,
     implementations.logistic_regression,
     helpers.calculate_nll,
-    np.logspace(0.440625, 0.44375, 5),
+    np.logspace(-2, -1, 5),
     initial_w=np.zeros(x_train_p.shape[1]),
     # initial_w=(np.random.random(x_train_p.shape[1]) - 0.5)*10,
     max_iters=100,
