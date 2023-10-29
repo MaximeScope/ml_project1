@@ -239,7 +239,7 @@ weights, f_score = helpers.train_model(
     1,
     implementations.logistic_regression,
     helpers.calculate_nll,
-    np.logspace(-2, -1, 5),
+    np.logspace(-0.307565789, -0.306743421, 20),
     initial_w=np.zeros(x_train_p.shape[1]),
     # initial_w=(np.random.random(x_train_p.shape[1]) - 0.5)*10,
     max_iters=100,

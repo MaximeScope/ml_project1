@@ -58,6 +58,7 @@ def load_csv_data(data_path, sub_sample=False):
     train_ids = x_train[:, 0].astype(dtype=int)
     test_ids = x_test[:, 0].astype(dtype=int)
     x_train = x_train[:, 1:]
+    x_train_head = x_train_head[1:]
     x_test = x_test[:, 1:]
 
     return x_train, x_train_head, x_test, y_train, train_ids, test_ids
