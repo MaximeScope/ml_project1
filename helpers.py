@@ -89,33 +89,6 @@ def build_k_indices(y, k_fold, seed):
     return np.array(k_indices)
 
 
-def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
-    """return the loss of ridge regression for a fold corresponding to k_indices
-
-    Args:
-        y:          shape=(N,)
-        x:          shape=(N,)
-        k_indices:  2D array returned by build_k_indices()
-        k:          scalar, the k-th fold (N.B.: not to confused with k_fold which is the fold nums)
-        lambda_:    scalar, cf. ridge_regression()
-
-    Returns:
-        train and test root mean square errors rmse = sqrt(2 mse)
-
-    >>> ridge_regression_cross_validation(np.array([1.,2.,3.,4.]), np.array([6.,7.,8.,9.]), np.array([[3,2], [0,1]]), 1, 2)
-    (0.019866645527597114, 0.33555914361295175)
-    """
-    test_x = np.array([x[i] for i in k_indices[k]])
-    test_y = np.array([y[i] for i in k_indices[k]])
-    train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
-    train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
-
-    w = implementations.ridge_regression(train_y, train_x, lambda_)
-
-    loss_te = np.sqrt(np.mean((test_y - test_x.dot(w)) ** 2))
-    return loss_te, w
-
-
 def calculate_fscore(y, x, w, pred_func):
     pred_y = process_labels(pred_func(w, x))
     f_vec = y + 2 * pred_y
@@ -143,34 +116,6 @@ def cross_validation(
 
     f_score = calculate_fscore(test_y, test_x, w, pred_func)
     return f_score, w
-
-
-def train_ridge_regression(y, x, k_fold, lambdas, seed):
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    best_rmse = 99999
-    best_w = np.zeros(x.shape[1])
-    for lambda_ in lambdas:
-        print("Checking lambda " + str(lambda_))
-        loss_te_sum = 0
-        w_sum = np.zeros(x.shape[1])
-        for k in range(k_fold):
-            loss_te, w = ridge_regression_cross_validation(y, x, k_indices, k, lambda_)
-            loss_te_sum += loss_te
-            w_sum += w
-
-        curr_rmse = loss_te_sum / k_fold
-        if curr_rmse < best_rmse:
-            print(
-                "Got best w with lambda "
-                + str(lambda_)
-                + " with rmse "
-                + str(curr_rmse)
-            )
-            best_rmse = curr_rmse
-            best_w = w_sum / k_fold
-
-    return best_w, best_rmse
 
 
 def train_model(
@@ -480,7 +425,7 @@ def balance_data(x_train, y_train):
         x_train_b: balanced input data
         y_train_b: balanced output data
     """
-    #x_train, y_train = shuffle_data(x_train, y_train)
+    # x_train, y_train = shuffle_data(x_train, y_train)
     # Count number of y_train entries = 1
     tot_ytrain1 = len(y_train[y_train == 1])
 
