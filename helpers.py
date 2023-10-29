@@ -58,6 +58,7 @@ def load_csv_data(data_path, sub_sample=False):
     train_ids = x_train[:, 0].astype(dtype=int)
     test_ids = x_test[:, 0].astype(dtype=int)
     x_train = x_train[:, 1:]
+    x_train_head = x_train_head[1:]
     x_test = x_test[:, 1:]
 
     return x_train, x_train_head, x_test, y_train, train_ids, test_ids
@@ -291,9 +292,10 @@ def first_filter(x_train, x_train_head, x_test, filter):
             indexes_to_delete.append(col_index)
 
     x_train_f1 = np.delete(x_train, indexes_to_delete, axis=1)
+    x_train_f1_head = np.delete(x_train_head, indexes_to_delete, axis=0)
     x_test_f1 = np.delete(x_test, indexes_to_delete, axis=1)
 
-    return x_train_f1, x_test_f1
+    return x_train_f1, x_test_f1, x_train_f1_head
 
 
 def make_predictions_linear_regression(weights, x_test):
