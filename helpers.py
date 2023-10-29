@@ -300,7 +300,6 @@ def calculate_fscore(y, x, w, pred_func):
     tp = np.count_nonzero(f_vec == 3)
     fp = np.count_nonzero(f_vec == 2)
     fn = np.count_nonzero(f_vec == 1)
-    print(f_vec)
     return tp / (tp + (fp + fn) / 2)
 
 

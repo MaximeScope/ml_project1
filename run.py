@@ -2,6 +2,7 @@ import numpy as np
 import helpers
 import implementations
 
+# Setting random seed for the shuffling of the data points
 np.random.seed(42)
 
 # Manually selected list of features to delete:
@@ -38,19 +39,19 @@ x_train, x_train_head, x_test, y_train, train_ids, test_ids = helpers.load_csv_d
 ## 2. Convert labels from {-1, 1} to {0, 1}
 y_train_p = helpers.process_labels(y_train)
 
-## 3. First filter:
+## 3. First filter:
 x_train_f1, x_test_f1 = helpers.first_filter(x_train, x_train_head, x_test, filter1)
 
-## 5. Replace NaN values with the mean of the column:
+## 4. Replace NaN values with the mean of the column:
 x_train_f1, x_test_f1 = helpers.replace_nan_with_median(x_train_f1, x_test_f1)
 
-## 6. Second filter:
+## 5. Second filter:
 x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1, 1)
 
-## 7. Encode the categorical features and standardize the data
+## 6. Encode the categorical features and standardize the data
 x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 10)
 
-## 8. Train the model:
+## 7. Train the model:
 weights, f_score = helpers.train_model(
     y_train_p,
     x_train_p,
@@ -60,12 +61,11 @@ weights, f_score = helpers.train_model(
     helpers.make_predictions_logistic_regression,
     np.logspace(-0.226625, -0.226375, 5),
     initial_w=np.zeros(x_train_p.shape[1]),
-    # initial_w=(np.random.random(x_train_p.shape[1]) - 0.5)*10,
     max_iters=100,
 )
 
-### 7. Make predictions:
+## 8. Make predictions:
 y_pred = helpers.make_predictions_logistic_regression(weights, x_test_p)
 
-# Store the predictions in a submission_file.csv in CSV format without index_label
+## 9. Store the predictions in a submission_file.csv in CSV format without index_label
 helpers.create_csv_submission(test_ids, y_pred, "submission.csv")
