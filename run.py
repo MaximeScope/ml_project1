@@ -206,8 +206,8 @@ x_train_f1, x_test_f1 = helpers.first_filter(x_train, x_train_head, x_test, filt
 print(f"applied first filter, remaining features: {x_train_f1.shape[1]}")
 
 ## 4. Balance the data
-x_train_f1, y_train_p = helpers.balance_data(x_train_f1, y_train_p)
-print(f"dataset balanced with {x_train.shape[0]} samples")
+# x_train_f1, y_train_p = helpers.balance_data(x_train_f1, y_train_p)
+# print(f"dataset balanced with {x_train.shape[0]} samples")
 
 ## 5. Replace NaN values with the mean of the column:
 x_train_f1, x_test_f1 = helpers.replace_nan_with_median(x_train_f1, x_test_f1)
@@ -239,7 +239,7 @@ weights, f_score = helpers.train_model(
     1,
     implementations.logistic_regression,
     helpers.calculate_nll,
-    np.logspace(-0.307565789, -0.306743421, 20),
+    np.logspace(-0.307565789, -0.306743421, 5),
     initial_w=np.zeros(x_train_p.shape[1]),
     # initial_w=(np.random.random(x_train_p.shape[1]) - 0.5)*10,
     max_iters=100,

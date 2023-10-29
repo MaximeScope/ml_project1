@@ -134,6 +134,8 @@ def cross_validation(
     train_x = np.array([x[i] for i in range(len(x)) if i not in k_indices[k]])
     train_y = np.array([y[i] for i in range(len(y)) if i not in k_indices[k]])
 
+    train_x, train_y = balance_data(train_x, train_y)
+
     if initial_w is None:
         w, _ = function(train_y, train_x, param)
     else:
@@ -478,6 +480,7 @@ def balance_data(x_train, y_train):
         x_train_b: balanced input data
         y_train_b: balanced output data
     """
+    x_train, y_train = shuffle_data(x_train, y_train)
     # Count number of y_train entries = 1
     tot_ytrain1 = len(y_train[y_train == 1])
 
