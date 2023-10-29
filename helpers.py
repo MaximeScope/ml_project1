@@ -139,9 +139,6 @@ def process_features(x_train, x_test, onehot_thresh=100):
             )
             x_train_processed = np.hstack((x_train_processed, x_trainj_onehot))
             x_test_processed = np.hstack((x_test_processed, x_testj_onehot))
-            print(
-                f"Feature index {j} has {num_uniquej} unique values --> onehot encoding"
-            )
 
         else:
             # standardize if number of unique values is greater than onehot_thresh
@@ -150,9 +147,6 @@ def process_features(x_train, x_test, onehot_thresh=100):
             )
             x_train_processed = np.hstack((x_train_processed, x_trainj_standardized))
             x_test_processed = np.hstack((x_test_processed, x_testj_standardized))
-            print(
-                f"Feature index {j} has {num_uniquej} > {onehot_thresh} unique values --> standardizing"
-            )
 
     # Add bias term
     x_train_processed = np.hstack(
@@ -195,7 +189,6 @@ def train_model(
 
     best_fscore = 0
     best_w = np.zeros(x.shape[1])
-    print(f"Checking params {params}")
     for param in params:
         fscore_sum = 0
         w_sum = np.zeros(x.shape[1])
@@ -206,7 +199,6 @@ def train_model(
             fscore_sum += f_score
             w_sum += w
         curr_fscore = fscore_sum / k_fold
-        print(f"Got F score {curr_fscore} for param {param}")
         if curr_fscore > best_fscore:
             best_fscore = curr_fscore
             best_w = w_sum / k_fold
