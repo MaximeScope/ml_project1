@@ -116,8 +116,8 @@ def ridge_regression_cross_validation(y, x, k_indices, k, lambda_):
     return loss_te, w
 
 
-def calculate_fscore(y, x, w):
-    pred_y = process_labels(make_predictions_logistic_regression(w, x))
+def calculate_fscore(y, x, w, pred_func):
+    pred_y = process_labels(pred_func(w, x))
     f_vec = y + 2*pred_y
     tp = np.count_nonzero(f_vec == 3)
     fp = np.count_nonzero(f_vec == 2)
@@ -127,7 +127,7 @@ def calculate_fscore(y, x, w):
 
 
 def cross_validation(
-    y, x, k_indices, k, function, loss_fn, param, initial_w=None, max_iters=None
+    y, x, k_indices, k, function, pred_func, param, initial_w=None, max_iters=None
 ):
     test_x = np.array([x[i] for i in k_indices[k]])
     test_y = np.array([y[i] for i in k_indices[k]])
@@ -141,7 +141,7 @@ def cross_validation(
     else:
         w, _ = function(train_y, train_x, initial_w, max_iters, param)
 
-    f_score = calculate_fscore(test_y, test_x, w)
+    f_score = calculate_fscore(test_y, test_x, w, pred_func)
     return f_score, w
 
 
@@ -174,7 +174,7 @@ def train_ridge_regression(y, x, k_fold, lambdas, seed):
 
 
 def train_model(
-    y, x, k_fold, seed, function, loss_fn, params, initial_w=None, max_iters=None
+    y, x, k_fold, seed, function, pred_func, params, initial_w=None, max_iters=None
 ):
     k_indices = build_k_indices(y, k_fold, seed)
 
@@ -186,7 +186,7 @@ def train_model(
         w_sum = np.zeros(x.shape[1])
         for k in range(k_fold):
             f_score, w = cross_validation(
-                y, x, k_indices, k, function, loss_fn, param, initial_w, max_iters
+                y, x, k_indices, k, function, pred_func, param, initial_w, max_iters
             )
             fscore_sum += f_score
             w_sum += w
@@ -480,7 +480,7 @@ def balance_data(x_train, y_train):
         x_train_b: balanced input data
         y_train_b: balanced output data
     """
-    x_train, y_train = shuffle_data(x_train, y_train)
+    #x_train, y_train = shuffle_data(x_train, y_train)
     # Count number of y_train entries = 1
     tot_ytrain1 = len(y_train[y_train == 1])
 
