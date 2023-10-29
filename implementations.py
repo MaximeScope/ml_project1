@@ -140,6 +140,9 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         initial_w: shape=(D, 1)
         max_iters: int
         gamma: float
+    Returns:
+        w: shape=(D, 1)
+        loss: scalar
     """
     # init parameters
     w = initial_w
@@ -149,5 +152,5 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         # get loss, grad and update w.
         grad = helpers.calculate_grad_nll(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * grad
-    loss = helpers.calculate_nll(y, tx, w) + lambda_ / 2 * np.linalg.norm(w, 2) ** 2
+    loss = helpers.calculate_nll(y, tx, w)
     return w, loss

@@ -361,7 +361,7 @@ def replace_nan_with_median(x_train, x_test):
 
 def second_filter(x_train, x_test, tol=1e-3):
     """
-    Filter the features that are proportional to each other
+    Filter the features that are equal to each other within a tolerance
     Args:
         x_train: numpy array of shape (N,D), D is the number of features.
         x_test: numpy array of shape (N,D), D is the number of features.
