@@ -201,27 +201,26 @@ x_train, x_train_head, x_test, y_train, train_ids, test_ids = helpers.load_csv_d
 ## 2. Convert labels from {-1, 1} to {0, 1}
 y_train_p = helpers.process_labels(y_train)
 
-## 3. Balance the data
-x_train, y_train_p = helpers.balance_data(x_train, y_train_p)
-print(f"dataset balanced with {x_train.shape[0]} samples")
-
-## 4. Filter the features:
-# First filter
+## 3. First filter:
 x_train_f1, x_test_f1 = helpers.first_filter(x_train, x_train_head, x_test, filter1)
 print(f"applied first filter, remaining features: {x_train_f1.shape[1]}")
 
-# Replace NaN values with the mean of the column:
+## 4. Balance the data
+x_train_f1, y_train_p = helpers.balance_data(x_train_f1, y_train_p)
+print(f"dataset balanced with {x_train.shape[0]} samples")
+
+## 5. Replace NaN values with the mean of the column:
 x_train_f1, x_test_f1 = helpers.replace_nan_with_median(x_train_f1, x_test_f1)
 
-# Second filter
+## 6. Second filter:
 x_train_f2, x_test_f2 = helpers.second_filter(x_train_f1, x_test_f1, 1)
 print(f"applied second filter, remaining features: {x_train_f2.shape[1]}")
 
-## 5. Encode the categorical features and standardize the data
+## 7. Encode the categorical features and standardize the data
 x_train_p, x_test_p = helpers.process_features(x_train_f2, x_test_f2, 10)
 print(f'features processed, remaining features: {x_train_p.shape[1]}')
 
-## 6. Train the model:
+## 8. Train the model:
 # Weights from least squares
 # weights, _ = implementations.least_squares(y_train, x_train_f2)
 
