@@ -33,7 +33,7 @@ filter1 = ["GENHLTH", "PHYSHLTH", "MENTHLTH", "POORHLTH", "HLTHPLN1", "PERSDOC2"
 
 ## 1. Load the training data into feature matrix and class labels
 x_train, x_train_head, x_test, y_train, train_ids, test_ids = helpers.load_csv_data(
-    "data"
+    "dataset_to_release"
 )
 
 ## 2. Convert labels from {-1, 1} to {0, 1}
